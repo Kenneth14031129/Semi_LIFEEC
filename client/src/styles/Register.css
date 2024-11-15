@@ -1,0 +1,156 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #00223E, #0A3D62);
+}
+
+.register-form-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.register-logo {
+  display: block;
+  margin: 0 auto 1.5rem;
+  max-width: 100px;
+}
+
+h2 {
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+p {
+  color: #666;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.75rem;
+  padding-right: 2.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #0A3D62;
+  outline: none;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:focus {
+  outline: none;
+}
+
+.password-toggle svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.register-button,
+.google-register-button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.register-button {
+  background-color: #0A3D62;
+  color: white;
+}
+
+.register-button:hover {
+  background-color: #00223E;
+}
+
+.google-register-button {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-register-button:hover {
+  background-color: #f8f8f8;
+}
+
+.google-register-button svg {
+  margin-right: 0.5rem;
+}
+
+.login-prompt {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.login-prompt a {
+  color: #0A3D62;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+/* Toast Styles (if needed) */
+.Toastify__toast-container {
+  width: auto;
+  max-width: 350px;
+}
+
+.Toastify__toast {
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.Toastify__toast--success {
+  background: #4caf50;
+}
+
+.Toastify__toast--error {
+  background: #f44336;
+}
+
+.Toastify__toast--info {
+  background: #2196f3;
+}

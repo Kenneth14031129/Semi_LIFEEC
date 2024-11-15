@@ -1,0 +1,176 @@
+/* Container for the entire Activities component */
+.activities-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba(0, 31, 63, 0.6), rgba(0, 64, 128, 0.6)),
+              url('../assets/healthcare.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  margin-top: 60px;
+  padding: 20px;
+}
+
+/* Form container styling with glass effect */
+.activities-form {
+  margin: 30px auto;
+  padding: 50px;
+  max-width: 850px;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 15px !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glass effect shine */
+.activities-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+}
+
+/* Form title styling */
+.activities-form .MuiTypography-h4 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Subtitle styling */
+.activities-form .MuiTypography-body1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+/* Section titles */
+.activities-form .MuiTypography-h6 {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+/* Input fields styling */
+.activities-form .MuiTextField-root,
+.activities-form .MuiFormControl-root {
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+/* Input field customization */
+.activities-form .MuiOutlinedInput-root {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.activities-form .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.activities-form .MuiInputLabel-root {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.activities-form .MuiOutlinedInput-input {
+  color: #ffffff;
+}
+
+.activities-form .MuiSelect-icon {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* MenuItem styling */
+.activities-form .MuiMenuItem-root {
+  color: #000000;
+}
+
+/* Submit button styling */
+.activities-form .MuiButton-containedPrimary {
+  background: linear-gradient(45deg, rgba(0, 31, 63, 0.8), rgba(0, 64, 128, 0.8));
+  font-size: 18px;
+  padding: 15px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  color: white;
+  font-weight: bold;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  margin-top: 20px;
+}
+
+.activities-form .MuiButton-containedPrimary:hover {
+  background: linear-gradient(45deg, rgba(0, 26, 53, 0.9), rgba(0, 51, 102, 0.9));
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Focus states */
+.activities-form .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.activities-form .MuiInputLabel-root.Mui-focused {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Loading and error states */
+.activities-container .MuiCircularProgress-root {
+  color: #ffffff;
+}
+
+.activities-container .error-container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .activities-form {
+    padding: 20px;
+    margin: 15px;
+  }
+
+  .activities-form .MuiTypography-h4 {
+    font-size: 1.8rem;
+  }
+
+  .activities-form .MuiTypography-h6 {
+    font-size: 1.3rem;
+  }
+
+  .activities-form .MuiButton-containedPrimary {
+    font-size: 16px;
+  }
+
+  .activities-container {
+    background-attachment: scroll;
+  }
+}

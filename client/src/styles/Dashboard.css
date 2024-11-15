@@ -1,0 +1,151 @@
+/* Dashboard specific variables */
+:root {
+  --primary-color: #007acc;
+  --secondary-color: #005f99;
+  --background-color: #0a2540;
+  --text-color: #ffffff;
+  --border-radius: 12px;
+  --box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  --focus-border-color: #66afe9;
+  --primary-font-size: 16px;
+  --heading-font-size: 24px;
+  --small-padding: 12px;
+  --medium-padding: 20px;
+  --large-padding: 40px;
+  --glass-background: rgba(255, 255, 255, 0.1);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Scope all styles to the Dashboard component */
+.dashboard-component body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: clamp(0.875rem, 1vw + 0.5rem, 1.125rem);
+}
+
+.dashboard-component .main-body {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba(0, 31, 63, 0.6), rgba(0, 64, 128, 0.6)),
+              url('../assets/healthcare.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  margin-top: 60px;
+}
+
+.dashboard-component main {
+  width: 100%;
+  max-width: 1200px;
+  height: 700px;
+  padding: var(--large-padding);
+  background: var(--glass-background);
+  border-radius: var(--border-radius);
+  border: var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--text-color);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add glass effect shine */
+.dashboard-component main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+}
+
+.dashboard-component main h1 {
+  font-size: clamp(1.5rem, 2vw + 1rem, 2.5rem);
+  margin-bottom: var(--medium-padding);
+  position: relative;
+}
+
+.dashboard-component button {
+  background: rgba(0, 122, 204, 0.3);
+  color: var(--text-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--small-padding) var(--medium-padding);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+.dashboard-component button:hover {
+  background: rgba(0, 95, 153, 0.4);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dashboard-component button:focus {
+  outline: 2px solid var(--focus-border-color);
+  outline-offset: 2px;
+}
+
+.dashboard-component a:focus {
+  outline: 2px solid var(--focus-border-color);
+  outline-offset: 2px;
+}
+
+/* Utility classes for spacing */
+.dashboard-component .m-0 { margin: 0; }
+.dashboard-component .m-sm { margin: var(--small-padding); }
+.dashboard-component .m-md { margin: var(--medium-padding); }
+.dashboard-component .m-lg { margin: var(--large-padding); }
+
+.dashboard-component .p-0 { padding: 0; }
+.dashboard-component .p-sm { padding: var(--small-padding); }
+.dashboard-component .p-md { padding: var(--medium-padding); }
+.dashboard-component .p-lg { padding: var(--large-padding); }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-component .chart-container {
+    max-width: 100%;
+  }
+
+  .dashboard-component main h1 {
+    font-size: 1.5rem;
+  }
+  
+  .dashboard-component .main-body {
+    background-attachment: scroll; /* Better performance on mobile */
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .dashboard-component {
+    --background-color: #121212;
+    --text-color: #e0e0e0;
+    --primary-color: #bb86fc;
+    --secondary-color: #3700b3;
+    --box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
+    --glass-background: rgba(18, 18, 18, 0.25);
+  }
+
+  .dashboard-component .chart-container {
+    background: rgba(44, 44, 44, 0.2);
+  }
+}

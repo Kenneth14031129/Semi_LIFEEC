@@ -1,0 +1,63 @@
+/* Main container */
+.landing-main {
+  font-size: 30px;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: linear-gradient(to right, #00223E, #0A3D62); /* Gradient Background */
+}
+
+/* Typography */
+h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 1.2px;
+  color: white;
+  margin-bottom: 20px;
+}
+
+p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 30px;
+}
+
+/* Button styling */
+.landing-login-button, 
+.landing-register-button {
+  background: #fff;
+  color: #0A3D62;
+  border: 3px solid #0A3D62;
+  width: 500px;
+  padding: 16px;
+  border-radius: 30px;
+  font-weight: 600;
+  margin-top: 15px;
+  font-size: 20px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.5s ease;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.landing-login-button:hover,
+.landing-register-button:hover {
+  background: #0A3D62;
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .landing-login-button,
+  .landing-register-button {
+      width: 80%;
+      font-size: 18px;
+  }
+}
