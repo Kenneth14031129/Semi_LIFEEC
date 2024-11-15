@@ -23,13 +23,22 @@ const bcrypt = require("bcryptjs");
 
 // Enable CORS to allow requests from the frontend
 app.use(cors({
-    origin: 'http://localhost:5173', 
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type'],
+    origin: [
+        'http://localhost:5173',
+        'https://semi-lifeec.onrender.com'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
+
+// Test route
+app.get("/api/v1/test", (req, res) => {
+    res.json({ message: "API is working", timestamp: new Date().toISOString() });
+});
 
 // Routes
 app.use("/api/v1", mainRouter); 
@@ -43,6 +52,25 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/emergency-alerts", emergencyAlertRoutes);
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, 'client/dist')));
+    
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, 'client/dist', 'index.html'));
+    });
+}
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        status: 'error',
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong!',
+        error: process.env.NODE_ENV === 'development' ? err : {}
+    });
+});
 
 const port = process.env.PORT || 3000;
 
