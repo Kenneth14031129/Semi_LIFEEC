@@ -111,22 +111,25 @@ const seedUsers = async () => {
 const start = async () => {
     try {
         await connectDB(process.env.MONGO_URI);
+        console.log('Connected to MongoDB');
 
-        // Check for SEED environment variable or command-line argument
         const shouldSeed = process.env.SEED === 'true' || process.argv.includes('--seed');
 
         if (shouldSeed) {
             console.log("Seeding database...");
             await seedUsers();
             console.log("Seeding completed.");
-            process.exit(); // Exit after seeding
+            process.exit();
         } else {
-            app.listen(port, () => {
+            app.listen(port, '0.0.0.0', () => {
                 console.log(`Server is listening on port ${port}`);
+                console.log(`Environment: ${process.env.NODE_ENV}`);
+                console.log(`API URL: ${process.env.VITE_API_URL}`);
             });
         }
     } catch (error) {
-        console.log(error);
+        console.error('Startup error:', error);
+        process.exit(1);
     }
 };
 
