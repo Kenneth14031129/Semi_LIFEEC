@@ -1,7 +1,7 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useState, useEffect } from "react"; // Add useEffect to imports
+import React, { useState, useEffect } from "react";
 import "../styles/ResidentList.css";
 import Header from "../components/Header";
+import { api } from '../api/api';
 
 const ResidentList = () => {
   const [residents, setResidents] = useState([]);
@@ -20,57 +20,71 @@ const ResidentList = () => {
     fetchMeals();
   }, []);
 
-  const fetchResidents = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/v1/patient/list");
-      if (!response.ok) {
-        throw new Error("Failed to fetch residents");
-      }
-      const data = await response.json();
-      setResidents(data);
-    } catch (error) {
-      console.error("Error fetching residents:", error);
-    }
-  };
+  const BASE_URL = window.location.origin.includes('localhost') 
+  ? 'http://localhost:3000/api/v1'
+  : 'https://semi-lifeec.onrender.com/api/v1';
 
-  const fetchActivities = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/v1/activities/list");
-      if (!response.ok) {
-        throw new Error("Failed to fetch activities");
-      }
-      const data = await response.json();
-      setActivities(data.activities);
-    } catch (error) {
-      console.error("Error fetching activities:", error);
-    }
-  };
+const api = {
+  get: async (endpoint) => {
+    const response = await fetch(`${BASE_URL}${endpoint}`);
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  },
+  put: async (endpoint, data) => {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  },
+  post: async (endpoint, data) => {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  }
+};
 
-  const fetchHealthProgress = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/v1/health-progress/list");
-      if (!response.ok) {
-        throw new Error("Failed to fetch health progress");
-      }
-      const data = await response.json();
-      setHealthProgress(data);
-    } catch (error) {
-      console.error("Error fetching health progress:", error);
-    }
-  };
+const fetchResidents = async () => {
+  try {
+    const data = await api.get('/patient/list');
+    setResidents(data);
+  } catch (error) {
+    console.error("Error fetching residents:", error);
+  }
+};
 
-  const fetchMeals = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/v1/meal/list");
-      if (!response.ok) {
-        throw new Error("Failed to fetch meals");
-      }
-      const data = await response.json();
-      setMeals(data); // Assuming the meals are in the 'data' property of the response
-    } catch (error) {
-      console.error("Error fetching meals:", error);
-    }
-  };
+const fetchActivities = async () => {
+  try {
+    const data = await api.get('/activities/list');
+    setActivities(data.activities);
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+  }
+};
+
+const fetchHealthProgress = async () => {
+  try {
+    const data = await api.get('/health-progress/list');
+    setHealthProgress(data);
+  } catch (error) {
+    console.error("Error fetching health progress:", error);
+  }
+};
+
+const fetchMeals = async () => {
+  try {
+    const data = await api.get('/meal/list');
+    setMeals(data);
+  } catch (error) {
+    console.error("Error fetching meals:", error);
+  }
+};
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -129,78 +143,38 @@ const ResidentList = () => {
 
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
-    setSelectedResident(editedResident); // Optimistically update UI
-
-    if (editedResident && editedResident.healthProgress) {
-      for (let healthProgress of editedResident.healthProgress) {
+    setSelectedResident(editedResident);
+  
+    if (editedResident?.healthProgress) {
+      for (let progress of editedResident.healthProgress) {
         try {
-          const response = await fetch(`http://localhost:3000/api/v1/health-progress/${healthProgress._id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(healthProgress),
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to update health progress');
-          }
-
-          const updatedhealthProgress = await response.json();
-          console.log('Health progress updated:', updatedhealthProgress);
+          await api.put(`/health-progress/${progress._id}`, progress);
         } catch (error) {
           console.error('Error updating health progress:', error);
-          // You might want to add some error handling here, like showing an error message to the user
         }
       }
     }
-
-    if (editedResident && editedResident.meals) {
+  
+    if (editedResident?.meals) {
       for (let meal of editedResident.meals) {
         try {
-          const response = await fetch(`http://localhost:3000/api/v1/meal/${meal._id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(meal),
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to update meal');
-          }
-
-          const updatedMeal = await response.json();
-          console.log('Meal updated:', updatedMeal);
+          await api.put(`/meal/${meal._id}`, meal);
         } catch (error) {
           console.error('Error updating meal:', error);
         }
       }
     }
-
-    if (editedResident && editedResident.activities) {
+  
+    if (editedResident?.activities) {
       for (let activity of editedResident.activities) {
         try {
-          const response = await fetch(`http://localhost:3000/api/v1/activities/${activity._id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(activity),
-          });
-  
-          if (!response.ok) {
-            throw new Error('Failed to update activity');
-          }
-  
-          const updatedActivity = await response.json();
-          console.log('Activity updated:', updatedActivity);
+          await api.put(`/activities/${activity._id}`, activity);
         } catch (error) {
           console.error('Error updating activity:', error);
         }
       }
     }
-
+  
     setIsEditing(false);
   };
   
@@ -215,24 +189,12 @@ const ResidentList = () => {
       alert("Please select a resident to send an emergency alert.");
       return;
     }
-
+  
     try {
-      const response = await fetch("http://localhost:3000/api/v1/emergency-alerts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          residentId: selectedResident._id,
-          message: "Emergency alert triggered", // Customize this message as needed
-        }),
+      const result = await api.post('/emergency-alerts', {
+        residentId: selectedResident._id,
+        message: "Emergency alert triggered",
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to send emergency alert");
-      }
-
-      const result = await response.json();
       console.log("Emergency alert sent:", result);
       alert("Emergency alert has been triggered and saved in the database.");
     } catch (error) {
@@ -240,7 +202,7 @@ const ResidentList = () => {
       alert("Failed to send emergency alert. Please try again.");
     }
   };
-
+  
   const handleEmergencyAlert = () => {
     sendEmergencyAlert();
   };
