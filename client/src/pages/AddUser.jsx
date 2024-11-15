@@ -1,9 +1,9 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import Header from "../components/Header.jsx";
 import "../styles/AddUser.css";
+import { api } from "../api/api";
 import {
   TextField,
   Button,
@@ -34,11 +34,7 @@ function AddUser() {
     setLoading(true);
     setHasError(false);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/users`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch users.");
-      }
-      const data = await response.json();
+      const data = await api.get('/user/users');
       setUsers(data.users || []);
       setLoading(false);
     } catch (error) {
@@ -118,7 +114,7 @@ function AddUser() {
       }
     }
   };
-
+  
   return (
     <div className="page-container">
       <Header />
