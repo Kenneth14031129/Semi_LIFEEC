@@ -4,8 +4,12 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "node seeders/userSeeder.js"
+    "start": "node app.js",
+    "server": "nodemon app.js",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "cd client && npm install --include=dev && npm run build",
+    "postinstall": "cd client && npm install --include=dev"
   },
   "author": "Kuzma02",
   "license": "ISC",
@@ -17,16 +21,25 @@
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
     "icons": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.3",
     "react": "^18.3.1",
-    "react-router-dom": "^6.26.2"
+    "react-apexcharts": "^1.5.0",
+    "react-icons": "^5.3.0",
+    "react-router-dom": "^6.26.2",
+    "react-toastify": "^10.0.6",
+    "vite": "^5.4.11"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.3",
+    "concurrently": "^8.2.2",
     "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

@@ -3,8 +3,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AuthService from "../../../services/AuthService";
-import Image from "../assets/Homemedixbg.png";
-import GoogleSvg from "../assets/icons8-google.svg";
 import Logo from "../assets/logo.png";
 import "../styles/Login.css";
 
