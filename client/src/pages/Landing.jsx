@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import AuthService from "../services/authService.js";
+import AuthService from "../../../services/authService";
 import Logo from "../assets/logo.jpg";
 import "../styles/Login.css";
 
