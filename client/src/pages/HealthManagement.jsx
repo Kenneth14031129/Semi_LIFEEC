@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from 'react';
 import "../styles/HealthGoals.css";
 import Header from "../components/Header";
@@ -139,22 +138,34 @@ const HealthManagement = () => {
 
       console.log("Submitting health progress data:", healthProgressData);
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/health-progress/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(healthProgressData),
-      });
-
-      const responseData = await response.json();
+      const responseData = await api.post('/health-progress/add', healthProgressData);
       console.log("Full server response:", responseData);
 
-      if (response.ok) {
-        alert("Health record created successfully!");
-      } else {
-        alert(`Failed to create health record. Server responded with: ${responseData.message}`);
-      }
+      alert("Health record created successfully!");
+
+      // Optionally clear the form here
+      setSelectedResident("");
+      setSelectedAllergy("");
+      setHealthProgress({
+        medicalCondition: "",
+        date: new Date().toISOString().split('T')[0],
+        status: "",
+      });
+      setMedication({
+        currentMedication: "",
+        dosage: "",
+        quantity: "",
+      });
+      setMedicationSchedule({
+        medication: "",
+        time: "",
+        taken: false,
+      });
+      setCarePlans({
+        healthAssessment: "",
+        administrationInstruction: "",
+      });
+      
     } catch (error) {
       console.error("Error submitting health data:", error);
       alert(`An error occurred while submitting health information: ${error.message}`);
