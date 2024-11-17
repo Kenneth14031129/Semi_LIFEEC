@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AuthService from "../../../services/authService";
 import Logo from "../assets/logo.jpg";
