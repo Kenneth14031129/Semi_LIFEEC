@@ -1,8 +1,8 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, useRef } from "react";
 import Header from "../components/Header.jsx";
 import AuthService from "../../../services/authService";
 import "../styles/Messages.css";
+import { api } from "../api/api";
 
 // Utility function to generate a color based on the first letter of the contact's name
 const getAvatarColor = (name) => {
@@ -25,8 +25,8 @@ const Messages = () => {
 
     const chatMessagesRef = useRef(null);
 
-    // Retrieve logged-in user ID from AuthService
-    useEffect(() => {
+     // Retrieve logged-in user ID from AuthService
+     useEffect(() => {
         const userId = AuthService.getUserId();
         if (userId) {
             setLoggedInUserId(userId);
@@ -41,16 +41,12 @@ const Messages = () => {
     useEffect(() => {
         const fetchContacts = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/user/users`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch contacts.");
-                }
-                const data = await response.json();
+                const data = await api.get('/user/users');
                 console.log("Fetched contacts:", data.users);
                 setContacts(data.users || []);
-                setFilteredContacts(data.users || []); // Initialize with all contacts
+                setFilteredContacts(data.users || []);
                 if (data.users && data.users.length > 0) {
-                    setSelectedContact(data.users[0]); // Default to the first contact
+                    setSelectedContact(data.users[0]);
                 }
             } catch (error) {
                 console.error("Error fetching contacts:", error);
@@ -77,7 +73,7 @@ const Messages = () => {
         fetchMessages(contact._id);
     };
 
-    // Fetch messages from the server for the selected contact
+    // Fetch messages for the selected contact
     const fetchMessages = async (contactId) => {
         if (!loggedInUserId || !contactId) {
             console.error("Both sender and receiver IDs are required.");
@@ -90,11 +86,7 @@ const Messages = () => {
         console.log(`Fetching messages between ${loggedInUserId} and ${contactId}`);
         
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/messages/${loggedInUserId}/${contactId}`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch messages.");
-            }
-            const data = await response.json();
+            const data = await api.get(`/messages/${loggedInUserId}/${contactId}`);
             console.log("Fetched messages:", data.messages);
             setMessages(data.messages || []);
         } catch (error) {
@@ -109,19 +101,9 @@ const Messages = () => {
     const sendMessageToServer = async (message) => {
         console.log("Sending message to server:", message);
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/messages/send`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(message),
-            });
-            if (!response.ok) {
-                throw new Error("Failed to send message.");
-            }
-            const savedMessage = await response.json();
+            const savedMessage = await api.post('/messages/send', message);
             console.log("Message sent and saved:", savedMessage.message);
-            setMessages((prevMessages) => [...prevMessages, savedMessage.message]); // Add saved message to the list
+            setMessages((prevMessages) => [...prevMessages, savedMessage.message]);
         } catch (error) {
             console.error("Error sending message:", error);
             setError("Failed to send message.");
