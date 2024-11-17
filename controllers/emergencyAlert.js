@@ -2,17 +2,18 @@ const EmergencyAlert = require("../models/EmergencyAlert");
 
 exports.createEmergencyAlert = async (req, res) => {
   try {
-    const { residentId, message, timestamp } = req.body;
+    const { residentId, residentName, message, timestamp } = req.body;
     console.log("Request to create alert received:", req.body);
 
-    if (!residentId) {
-      console.log("Missing resident ID");
-      return res.status(400).json({ message: "Resident ID is required" });
+    if (!residentId || !residentName) {
+      console.log("Missing required fields");
+      return res.status(400).json({ message: "Resident ID and name are required" });
     }
 
     const newAlert = new EmergencyAlert({
       residentId,
-      message: message || "Emergency alert triggered",
+      residentName,
+      message: message || `Emergency alert triggered for ${residentName}`,
       timestamp: timestamp || Date.now(),
     });
 
@@ -35,7 +36,7 @@ exports.createEmergencyAlert = async (req, res) => {
 exports.getEmergencyAlerts = async (req, res) => {
   try {
     console.log("Request to fetch all emergency alerts received");
-    const alerts = await EmergencyAlert.find(); // Modify as needed to match your database structure
+    const alerts = await EmergencyAlert.find().sort({ timestamp: -1 }); // Added sorting by timestamp
     
     console.log("Fetched alerts:", alerts);
     res.status(200).json({ success: true, data: alerts });

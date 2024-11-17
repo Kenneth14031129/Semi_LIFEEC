@@ -24,31 +24,71 @@ const ResidentList = () => {
   ? 'http://localhost:3000/api/v1'
   : 'https://semi-lifeec.onrender.com/api/v1';
 
-const api = {
-  get: async (endpoint) => {
-    const response = await fetch(`${BASE_URL}${endpoint}`);
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  },
-  put: async (endpoint, data) => {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  },
-  post: async (endpoint, data) => {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  }
-};
+  const api = {
+    get: async (endpoint) => {
+      try {
+        const response = await fetch(`${BASE_URL}${endpoint}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || response.statusText);
+        return data;
+      } catch (error) {
+        console.error(`GET Error (${endpoint}):`, error);
+        throw error;
+      }
+    },
+    
+    post: async (endpoint, data) => {
+      try {
+        const response = await fetch(`${BASE_URL}${endpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+        const responseData = await response.json();
+        if (!response.ok) throw new Error(responseData.message || response.statusText);
+        return responseData;
+      } catch (error) {
+        console.error(`POST Error (${endpoint}):`, error);
+        throw error;
+      }
+    },
+    
+    put: async (endpoint, data) => {
+      try {
+        const response = await fetch(`${BASE_URL}${endpoint}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+        const responseData = await response.json();
+        if (!response.ok) throw new Error(responseData.message || response.statusText);
+        return responseData;
+      } catch (error) {
+        console.error(`PUT Error (${endpoint}):`, error);
+        throw error;
+      }
+    },
+
+    delete: async (endpoint) => {
+      try {
+        const response = await fetch(`${BASE_URL}${endpoint}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.message || response.statusText);
+        }
+        return true;
+      } catch (error) {
+        console.error(`DELETE Error (${endpoint}):`, error);
+        throw error;
+      }
+    }
+  };
 
 const fetchResidents = async () => {
   try {
@@ -190,19 +230,32 @@ const fetchMeals = async () => {
       return;
     }
   
+    console.log("Selected resident for alert:", selectedResident);
+  
     try {
-      const result = await api.post('/emergency-alerts', {
+      if (!selectedResident._id || !selectedResident.name) {
+        throw new Error("Resident ID or name is missing");
+      }
+  
+      const alertData = {
         residentId: selectedResident._id,
-        message: "Emergency alert triggered",
-      });
-      console.log("Emergency alert sent:", result);
-      alert("Emergency alert has been triggered and saved in the database.");
+        residentName: selectedResident.name,
+        message: `Emergency alert triggered for ${selectedResident.name}`,
+        timestamp: new Date().toISOString()
+      };
+  
+      console.log("Sending emergency alert data:", alertData);
+  
+      const result = await api.post('/emergency-alerts', alertData);
+      console.log("Emergency alert sent successfully:", result);
+      alert(`Emergency alert has been triggered for ${selectedResident.name}`);
+  
     } catch (error) {
       console.error("Error sending emergency alert:", error);
-      alert("Failed to send emergency alert. Please try again.");
+      alert(`Failed to send emergency alert: ${error.message}`);
     }
   };
-  
+
   const handleEmergencyAlert = () => {
     sendEmergencyAlert();
   };

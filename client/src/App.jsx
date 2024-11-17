@@ -6,7 +6,7 @@ import MealManagement from './pages/MealManagement';
 import HealthManagement from './pages/HealthManagement';
 import Messages from './pages/Messages';
 import Activities from "./pages/Activities";
-import AddNurse from './pages/AddUser'; // Import AddNurse component
+import AddNurse from './pages/AddUser';
 
 import { ToastContainer } from 'react-toastify';
 
@@ -60,7 +60,7 @@ const router = createBrowserRouter([
         element: <Messages />,
       },
       {
-        path: "addUser", // Add the path for Add Nurse
+        path: "addUser",
         element: <AddNurse />,
       }
     ],

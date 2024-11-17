@@ -1,10 +1,13 @@
-// models/EmergencyAlert.js
 const mongoose = require("mongoose");
 
 const EmergencyAlertSchema = new mongoose.Schema({
   residentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Resident", // Reference to Resident model (if exists)
+    ref: "Resident",
+    required: true,
+  },
+  residentName: {
+    type: String,
     required: true,
   },
   message: {
