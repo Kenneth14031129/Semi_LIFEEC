@@ -10,7 +10,10 @@ import {
   FaUserCircle, 
   FaCaretDown, 
   FaUserNurse,
-  FaBell 
+  FaBell,
+  FaEnvelope,
+  FaUser,
+  FaSignOutAlt
 } from 'react-icons/fa';
 import "../styles/Header.css";
 
@@ -23,6 +26,9 @@ const Header = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
+  
+  // Get user from localStorage
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
     fetchNotifications();
@@ -144,9 +150,26 @@ const Header = () => {
 
           {isDropdownOpen && (
             <div className="dropdown-menu">
-              <Link to="/messages" className="dropdown-item">Messages</Link>
-              <Link to="/settings" className="dropdown-item">Settings</Link>
-              <Link to="/logout" className="dropdown-item">Logout</Link>
+              {/* Profile Section */}
+              <div className="profile-section">
+                <FaUser className="profile-section-icon" />
+                <div className="profile-details">
+                  <span className="user-email">{user.email || 'User'}</span>
+                  <span className="user-role">{user.userType}</span>
+                </div>
+              </div>
+              
+              {/* Menu Items */}
+              {user.userType === 'Admin' && (
+                <Link to="/messages" className="dropdown-item">
+                  <FaEnvelope className="dropdown-icon" />
+                  <span>Messages</span>
+                </Link>
+              )}
+              <Link to="/logout" className="dropdown-item">
+                <FaSignOutAlt className="dropdown-icon" />
+                <span>Logout</span>
+              </Link>
             </div>
           )}
         </div>

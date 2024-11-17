@@ -1,10 +1,96 @@
-.logout-main{
-    font-size: 30px;
+.logout-main {
     height: 100vh;
     width: 100%;
-
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
+    background-color: #000;
+    color: white;
+}
+
+.logout-content {
+    text-align: center;
+    padding: 2rem;
+    border-radius: 10px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.logout-icon {
+    font-size: 4rem;
+    color: #007acc;
+    margin-bottom: 1rem;
+    animation: slideDown 0.5s ease-out;
+}
+
+.logout-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.logout-content p {
+    font-size: 1.2rem;
+    color: #888;
+    margin-bottom: 2rem;
+}
+
+.loading-bar {
+    width: 300px;
+    height: 4px;
+    background-color: #222;
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.loading-progress {
+    height: 100%;
+    background-color: #007acc;
+    animation: loading 3s linear;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes loading {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .logout-content h1 {
+        font-size: 2rem;
+    }
+
+    .logout-content p {
+        font-size: 1rem;
+    }
+
+    .loading-bar {
+        width: 250px;
+    }
 }

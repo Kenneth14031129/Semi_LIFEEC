@@ -15,6 +15,12 @@ class AuthError extends Error {
   }
 }
 
+// Define role-based constants
+const USER_ROLES = {
+  OWNER: 'Owner',
+  ADMIN: 'Admin'  // Changed from SUPER_ADMIN to ADMIN
+};
+
 const Landing = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +32,20 @@ const Landing = () => {
       try {
         const token = JSON.parse(localStorage.getItem("authToken"));
         const user = JSON.parse(localStorage.getItem("user"));
-        if (token && user?.userType && ['Admin', 'Owner'].includes(user.userType)) {
-          navigate("/dashboard", { replace: true });
+        
+        if (token && user?.userType) {
+          const userRole = user.userType;
+          
+          // Validate allowed roles
+          if ([USER_ROLES.OWNER, USER_ROLES.ADMIN].includes(userRole)) {  // Updated role check
+            navigate("/dashboard", { replace: true });
+          }
         }
       } catch {
-        // Invalid storage data - do nothing
+        // Clear invalid data
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("user");
       }
     };
     
@@ -46,7 +61,7 @@ const Landing = () => {
       case 'INVALID_CREDENTIALS':
         return 'Invalid email or password.';
       case 'UNAUTHORIZED_ROLE':
-        return 'Access denied: Only Admin and Owner accounts can log in.';
+        return 'Access denied: Only Admin and Owner accounts can log in.';  // Updated error message
       case 'ACCOUNT_LOCKED':
         return 'This account has been locked. Please contact support.';
       case 'VALIDATION_ERROR':
@@ -74,17 +89,25 @@ const Landing = () => {
       const response = await api.post('/auth/login', { email, password });
       
       if (response.token && response.user) {
-        // Validate user type
-        if (!['Admin', 'Owner'].includes(response.user.userType)) {
+        const userRole = response.user.userType;
+
+        // Validate user role
+        if (![USER_ROLES.OWNER, USER_ROLES.ADMIN].includes(userRole)) {  // Updated role check
           throw new AuthError('Access denied: Only Admin and Owner can log in.', 'UNAUTHORIZED_ROLE');
         }
+
+        // Create user object with email
+        const userData = {
+          ...response.user,
+          email: email // Explicitly include email
+        };
 
         // Store auth data
         localStorage.setItem("authToken", JSON.stringify(response.token));
         localStorage.setItem("userId", JSON.stringify(response.user._id));
-        localStorage.setItem("user", JSON.stringify(response.user));
+        localStorage.setItem("user", JSON.stringify(userData)); // Store complete user data including email
         
-        toast.success("Login successful");
+        toast.success(`Welcome ${userRole}!`);
         navigate("/dashboard", { replace: true });
       } else {
         throw new AuthError('Invalid server response: Missing token or user data', 'INVALID_RESPONSE');
