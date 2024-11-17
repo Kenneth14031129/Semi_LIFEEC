@@ -1,3 +1,5 @@
+//api.js
+
 const BASE_URL = window.location.origin.includes('localhost') 
   ? 'http://localhost:3000/api/v1'
   : 'https://semi-lifeec.onrender.com/api/v1';
