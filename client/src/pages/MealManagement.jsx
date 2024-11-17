@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Meal.css";
 import Header from "../components/Header";
+import { api } from "../api/api";
 import {
   TextField,
   Button,
@@ -43,17 +44,32 @@ const MealManagement = () => {
   useEffect(() => {
     const fetchResidents = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/patient/list`);
-        const data = await response.json();
+        const data = await api.get('/patient/list');
         setResidents(data);
       } catch (error) {
         console.error('Error fetching residents:', error);
+        setSnackbarMessage('Error fetching residents list');
+        setSnackbarOpen(true);
       }
     };
 
     fetchResidents();
   }, []);
 
+  useEffect(() => {
+    const fetchResidents = async () => {
+      try {
+        const data = await api.get('/patient/list');
+        setResidents(data);
+      } catch (error) {
+        console.error('Error fetching residents:', error);
+        setSnackbarMessage('Error fetching residents list');
+        setSnackbarOpen(true);
+      }
+    };
+
+    fetchResidents();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,20 +102,7 @@ const MealManagement = () => {
     console.log("Sending meal data:", JSON.stringify(mealData, null, 2));
   
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/meal/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(mealData),
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Server error: ${errorData.error || response.statusText}`);
-      }
-  
-      const responseData = await response.json();
+      const responseData = await api.post('/meal/add', mealData);
       console.log('Meal submitted successfully:', responseData);
   
       setSnackbarMessage(`Meal Management Information Submitted for Resident ID: ${selectedResident}!`);

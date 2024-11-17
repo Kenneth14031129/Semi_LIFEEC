@@ -1,5 +1,5 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
+import { api } from "../api/api";
 import "../styles/Activities.css";
 import Header from "../components/Header";
 import {
@@ -32,34 +32,27 @@ const Activities = () => {
   }, []);
 
   const fetchResidents = async () => {
-  try {
-    setLoading(true);
-    setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/patient/list`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await api.get('/patient/list');
+      
+      if (!Array.isArray(data)) {
+        throw new Error('Residents data is not an array');
+      }
+
+      console.log('Fetched residents data:', data);
+      setResidents(data);
+    } catch (error) {
+      console.error('Error fetching residents:', error);
+      setError(error.message);
+      setSnackbarMessage("Error loading residents. Please try again.");
+      setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
     }
-
-    const data = await response.json();
-    console.log('Fetched residents data:', data);
-
-    if (!Array.isArray(data)) {
-      throw new Error('Residents data is not an array');
-    }
-
-    setResidents(data);
-  } catch (error) {
-    console.error('Error fetching residents:', error);
-    setError(error.message);
-    setSnackbarMessage("Error loading residents. Please try again.");
-    setSnackbarOpen(true);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const handleResidentChange = (event) => {
     const selectedResident = event.target.value;
@@ -85,19 +78,7 @@ const Activities = () => {
     };
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/activities/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(activityData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const result = await response.json();
+      const result = await api.post('/activities/add', activityData);
       console.log('Activity submitted successfully:', result);
       setSnackbarMessage("Activity submitted successfully!");
       setSnackbarOpen(true);
@@ -109,7 +90,7 @@ const Activities = () => {
       setDescription("");
     } catch (error) {
       console.error('Error submitting activity:', error);
-      setSnackbarMessage("Error submitting activity. Please try again.");
+      setSnackbarMessage("Error submitting activity: " + error.message);
       setSnackbarOpen(true);
     }
   };
