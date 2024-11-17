@@ -8,38 +8,60 @@ import "../styles/Login.css";
 
 const Landing = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Check if already logged in
   useEffect(() => {
     if (AuthService.isAuthenticated()) {
       navigate("/dashboard", { replace: true });
     }
   }, [navigate]);
 
+  const getErrorMessage = (err) => {
+    switch (err.code) {
+      case 'SERVER_UNREACHABLE':
+        return 'Cannot connect to the server. Please check your internet connection and try again.';
+      case 'REQUEST_TIMEOUT':
+        return 'The request took too long. Please try again.';
+      case 'INVALID_CREDENTIALS':
+        return 'Invalid email or password.';
+      case 'UNAUTHORIZED_ROLE':
+        return 'Access denied: Only Admin and Owner accounts can log in.';
+      case 'ACCOUNT_LOCKED':
+        return 'This account has been locked. Please contact support.';
+      case 'VALIDATION_ERROR':
+        return 'Please fill in all fields correctly.';
+      default:
+        return err.message || 'An unexpected error occurred. Please try again.';
+    }
+  };
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
+    setError(null);
+    setIsLoading(true);
+
+    const email = e.target.email.value.trim();
     const password = e.target.password.value;
 
     if (!email || !password) {
       toast.error("Please fill in all fields");
+      setIsLoading(false);
       return;
     }
 
     try {
       const { user } = await AuthService.login(email, password);
-
-      if (user.userType === "Admin" || user.userType === "Owner") {
-        toast.success("Login successful");
-        navigate("/dashboard", { replace: true }); // Added replace: true
-      } else {
-        toast.error("Access denied: Only Admin and Owner can log in.");
-        AuthService.logout();
-      }
+      toast.success("Login successful");
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       console.error('Login error:', err);
-      toast.error(err.message || "Login failed");
+      const errorMessage = getErrorMessage(err);
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -56,12 +78,14 @@ const Landing = () => {
           <div className="login-center">
             <h2>Welcome back!</h2>
             <p>Please enter your details</p>
+            {error && <div className="error-message">{error}</div>}
             <form onSubmit={handleLoginSubmit}>
               <input 
                 type="email" 
                 placeholder="Email" 
                 name="email"
                 required 
+                disabled={isLoading}
               />
               <div className="pass-input-div">
                 <input
@@ -69,6 +93,7 @@ const Landing = () => {
                   placeholder="Password"
                   name="password"
                   required
+                  disabled={isLoading}
                 />
                 {showPassword ? (
                   <FaEyeSlash onClick={() => setShowPassword(!showPassword)} />
@@ -78,7 +103,11 @@ const Landing = () => {
               </div>
               <div className="login-center-options">
                 <div className="remember-div">
-                  <input type="checkbox" id="remember-checkbox" />
+                  <input 
+                    type="checkbox" 
+                    id="remember-checkbox"
+                    disabled={isLoading}
+                  />
                   <label htmlFor="remember-checkbox">
                     Remember for 30 days
                   </label>
@@ -88,7 +117,12 @@ const Landing = () => {
                 </a>
               </div>
               <div className="login-center-buttons">
-                <button type="submit">Log In</button>
+                <button 
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Logging in...' : 'Log In'}
+                </button>
               </div>
             </form>
           </div>
