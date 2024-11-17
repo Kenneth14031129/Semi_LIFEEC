@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { api } from "../api/api";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import "../styles/BasicInformation.css";
@@ -21,7 +22,7 @@ function BasicInformation() {
   const [contact, setContact] = useState("");
   const [emergencyName, setEmergencyName] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
-  const [emergencyEmail, setEmergencyEmail] = useState(""); // New state for emergency email
+  const [emergencyEmail, setEmergencyEmail] = useState("");
 
   const navigate = useNavigate();
 
@@ -35,27 +36,11 @@ function BasicInformation() {
       contact,
       emergencyContactName: emergencyName,
       emergencyContactPhone: emergencyPhone,
-      emergencyContactEmail: emergencyEmail, // Include email in form data
+      emergencyContactEmail: emergencyEmail,
     };
   
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/patient/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Network response was not ok: ${response.status} ${errorText}`
-        );
-      }
-  
-      const newResident = await response.json();
+      const newResident = await api.post('/patient/add', formData);
       console.log("New Resident added:", newResident);
   
       alert("Resident added successfully!");
@@ -72,7 +57,7 @@ function BasicInformation() {
 
     if (field === "name") setEmergencyName(value);
     if (field === "phone") setEmergencyPhone(value);
-    if (field === "email") setEmergencyEmail(value); // Handle email input change
+    if (field === "email") setEmergencyEmail(value);
   };
 
   return (
