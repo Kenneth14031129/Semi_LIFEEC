@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import AuthService from "../../../services/authService";
-import Logo from "../assets/logo.png";
+import AuthService from "../services/authService.js";
+import Logo from "../assets/logo.jpg";
 import "../styles/Login.css";
 
-const Login = () => {
+const Landing = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  // Check if already logged in
   useEffect(() => {
     if (AuthService.isAuthenticated()) {
-      toast.success("You are already logged in", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     }
   }, [navigate]);
 
@@ -25,35 +22,24 @@ const Login = () => {
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    if (email && password) {
-      try {
-        const { user } = await AuthService.login(email, password);
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
-        if (user.userType === "Admin" || user.userType === "Owner") {
-          toast.success("Login successful", {
-            position: "top-right",
-            autoClose: 3000,
-          });
-          navigate("/dashboard");
-        } else {
-          toast.error("Access denied: Only Admin and Owner can log in.", {
-            position: "top-right",
-            autoClose: 3000,
-          });
-          AuthService.logout();
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error(err.message, {
-          position: "top-right",
-          autoClose: 3000,
-        });
+    try {
+      const { user } = await AuthService.login(email, password);
+
+      if (user.userType === "Admin" || user.userType === "Owner") {
+        toast.success("Login successful");
+        navigate("/dashboard", { replace: true }); // Added replace: true
+      } else {
+        toast.error("Access denied: Only Admin and Owner can log in.");
+        AuthService.logout();
       }
-    } else {
-      toast.error("Please fill in all fields", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+    } catch (err) {
+      console.error('Login error:', err);
+      toast.error(err.message || "Login failed");
     }
   };
 
@@ -71,12 +57,18 @@ const Login = () => {
             <h2>Welcome back!</h2>
             <p>Please enter your details</p>
             <form onSubmit={handleLoginSubmit}>
-              <input type="email" placeholder="Email" name="email" />
+              <input 
+                type="email" 
+                placeholder="Email" 
+                name="email"
+                required 
+              />
               <div className="pass-input-div">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   name="password"
+                  required
                 />
                 {showPassword ? (
                   <FaEyeSlash onClick={() => setShowPassword(!showPassword)} />
@@ -106,4 +98,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Landing;
