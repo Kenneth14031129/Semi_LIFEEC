@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import "../styles/HealthGoals.css";
 import Header from "../components/Header";
+import { api } from "../api/api";
 import {
   TextField,
   Button,
@@ -70,8 +71,7 @@ const HealthManagement = () => {
   useEffect(() => {
     const fetchResidents = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/v1/patient/list');
-        const data = await response.json();
+        const data = await api.get('/patient/list');
         setResidents(data);
       } catch (error) {
         console.error('Error fetching residents:', error);
