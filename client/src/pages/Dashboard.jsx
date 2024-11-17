@@ -62,7 +62,6 @@ const Dashboard = () => {
       <section className="main-body">
         <main>
           <h1>Dashboard</h1>
-          {user && <p>Welcome, {user.name}</p>}
           <div className="chart-container">
             <PatientBarChart />
           </div>
