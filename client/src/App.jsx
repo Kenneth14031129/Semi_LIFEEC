@@ -1,5 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { Dashboard, HomeLayout, Landing, Login, Logout, Register } from "./pages";
+import { Dashboard, HomeLayout, Landing, Logout } from "./pages";
 import BasicInformation from './pages/BasicInformation';
 import ResidentList from './pages/ResidentList';
 import MealManagement from './pages/MealManagement';

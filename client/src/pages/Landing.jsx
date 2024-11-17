@@ -2,9 +2,18 @@ import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import AuthService from "../../../services/authService";
+import { api } from "../api/api";
 import Logo from "../assets/logo.jpg";
 import "../styles/Login.css";
+
+// Custom error class to maintain consistency with existing error handling
+class AuthError extends Error {
+  constructor(message, code = 'AUTH_ERROR') {
+    super(message);
+    this.name = 'AuthError';
+    this.code = code;
+  }
+}
 
 const Landing = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,9 +22,19 @@ const Landing = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (AuthService.isAuthenticated()) {
-      navigate("/dashboard", { replace: true });
-    }
+    const checkAuth = () => {
+      try {
+        const token = JSON.parse(localStorage.getItem("authToken"));
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (token && user?.userType && ['Admin', 'Owner'].includes(user.userType)) {
+          navigate("/dashboard", { replace: true });
+        }
+      } catch {
+        // Invalid storage data - do nothing
+      }
+    };
+    
+    checkAuth();
   }, [navigate]);
 
   const getErrorMessage = (err) => {
@@ -52,11 +71,31 @@ const Landing = () => {
     }
 
     try {
-      const { user } = await AuthService.login(email, password);
-      toast.success("Login successful");
-      navigate("/dashboard", { replace: true });
+      const response = await api.post('/auth/login', { email, password });
+      
+      if (response.token && response.user) {
+        // Validate user type
+        if (!['Admin', 'Owner'].includes(response.user.userType)) {
+          throw new AuthError('Access denied: Only Admin and Owner can log in.', 'UNAUTHORIZED_ROLE');
+        }
+
+        // Store auth data
+        localStorage.setItem("authToken", JSON.stringify(response.token));
+        localStorage.setItem("userId", JSON.stringify(response.user._id));
+        localStorage.setItem("user", JSON.stringify(response.user));
+        
+        toast.success("Login successful");
+        navigate("/dashboard", { replace: true });
+      } else {
+        throw new AuthError('Invalid server response: Missing token or user data', 'INVALID_RESPONSE');
+      }
     } catch (err) {
       console.error('Login error:', err);
+      // Clean up any partial data
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("user");
+
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
       toast.error(errorMessage);
