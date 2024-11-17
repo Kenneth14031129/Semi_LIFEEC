@@ -4,11 +4,21 @@ import AuthService from "../../../services/authService";
 import "../styles/Messages.css";
 import { api } from "../api/api";
 
-// Utility function to generate a color based on the first letter of the contact's name
-const getAvatarColor = (name) => {
-    if (name === "Nurse") return "#000000"; // Black color for Nurse
-    if (name === "Family of the Resident") return "#32CD32"; // Green for Family of the Resident
-    return "#FF69B4"; // Pink for Nutritionist
+// Updated utility function with debug logging
+const getAvatarColor = (userType) => {
+    console.log("Getting avatar color for userType:", userType); // Debug log
+    
+    switch (userType?.toLowerCase()) { // Add case insensitive comparison
+        case "nurse":
+            return "#000000"; // Black color for Nurse
+        case "family member":
+            return "#32CD32"; // Green for Family Member
+        case "nutritionist":
+            return "#FF69B4"; // Pink for Nutritionist
+        default:
+            console.log("No matching user type found, using default color"); // Debug log
+            return "#808080"; // Default gray color
+    }
 };
 
 const Messages = () => {
@@ -19,18 +29,18 @@ const Messages = () => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
-    const [userTypeFilter, setUserTypeFilter] = useState(""); // New filter state
+    const [userTypeFilter, setUserTypeFilter] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const chatMessagesRef = useRef(null);
 
-     // Retrieve logged-in user ID from AuthService
-     useEffect(() => {
-        const userId = AuthService.getUserId();
-        if (userId) {
-            setLoggedInUserId(userId);
-            console.log("Logged-in user ID:", userId);
+    // Retrieve logged-in user ID from AuthService
+    useEffect(() => {
+        const user = AuthService.getUser();
+        if (user && user._id) {
+            setLoggedInUserId(user._id);
+            console.log("Logged-in user ID:", user._id);
         } else {
             console.error("User ID is undefined. Ensure the user is logged in.");
             setError("You must be logged in to view messages.");
@@ -41,8 +51,17 @@ const Messages = () => {
     useEffect(() => {
         const fetchContacts = async () => {
             try {
+                const token = AuthService.getAuthToken();
+                if (!token) {
+                    throw new Error("No authentication token found");
+                }
+
                 const data = await api.get('/user/users');
-                console.log("Fetched contacts:", data.users);
+                console.log("Fetched contacts with user types:", data.users.map(user => ({
+                    name: user.name,
+                    userType: user.userType
+                }))); // Debug log
+                
                 setContacts(data.users || []);
                 setFilteredContacts(data.users || []);
                 if (data.users && data.users.length > 0) {
@@ -50,34 +69,44 @@ const Messages = () => {
                 }
             } catch (error) {
                 console.error("Error fetching contacts:", error);
-                setError("Failed to load contacts.");
+                if (error.response?.status === 401) {
+                    setError("Session expired. Please log in again.");
+                    AuthService.logout();
+                } else {
+                    setError("Failed to load contacts.");
+                }
             }
         };
 
-        if (loggedInUserId) {
+        if (loggedInUserId && AuthService.isAuthenticated()) {
             fetchContacts();
         }
     }, [loggedInUserId]);
 
-    // Scroll to the bottom when messages change
+    // Scroll to bottom when messages change
     useEffect(() => {
         if (chatMessagesRef.current) {
             chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
         }
     }, [messages]);
 
-    // Handle contact click to load messages for that contact
+    // Handle contact click
     const handleContactClick = (contact) => {
         setSelectedContact(contact);
         console.log("Selected contact:", contact);
         fetchMessages(contact._id);
     };
 
-    // Fetch messages for the selected contact
+    // Fetch messages for selected contact
     const fetchMessages = async (contactId) => {
         if (!loggedInUserId || !contactId) {
             console.error("Both sender and receiver IDs are required.");
             setError("Invalid user ID or contact ID.");
+            return;
+        }
+
+        if (!AuthService.isAuthenticated()) {
+            setError("Please log in to view messages.");
             return;
         }
 
@@ -91,14 +120,24 @@ const Messages = () => {
             setMessages(data.messages || []);
         } catch (error) {
             console.error("Error fetching messages:", error);
-            setError("Failed to load messages.");
+            if (error.response?.status === 401) {
+                setError("Session expired. Please log in again.");
+                AuthService.logout();
+            } else {
+                setError("Failed to load messages.");
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    // Send message to the server
+    // Send message to server
     const sendMessageToServer = async (message) => {
+        if (!AuthService.isAuthenticated()) {
+            setError("Please log in to send messages.");
+            return;
+        }
+
         console.log("Sending message to server:", message);
         try {
             const savedMessage = await api.post('/messages/send', message);
@@ -106,38 +145,56 @@ const Messages = () => {
             setMessages((prevMessages) => [...prevMessages, savedMessage.message]);
         } catch (error) {
             console.error("Error sending message:", error);
-            setError("Failed to send message.");
+            if (error.response?.status === 401) {
+                setError("Session expired. Please log in again.");
+                AuthService.logout();
+            } else {
+                setError("Failed to send message.");
+            }
         }
     };
 
-    // Handle sending a new message
+    // Handle sending new message
     const handleSendMessage = () => {
         if (newMessage.trim() && selectedContact) {
             const newMsg = {
-                senderId: loggedInUserId, // Ensure this is the logged-in user's ID
+                senderId: loggedInUserId,
                 receiverId: selectedContact._id,
                 text: newMessage,
             };
             console.log("Preparing to send message:", newMsg);
 
-            // Send message to server and reset input
             sendMessageToServer(newMsg);
             setNewMessage("");
         } else {
-            console.error("Cannot send message: Either the new message text is empty or selected contact is not set.");
+            console.error("Cannot send message: Either message is empty or no contact selected.");
             setError("Please select a contact and enter a message.");
         }
     };
 
-    // Filter contacts based on search query and user type
+    // Filter contacts based on search and user type
     useEffect(() => {
         const filtered = contacts.filter(contact => {
             const matchesSearch = contact.name.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesType = userTypeFilter ? contact.userType === userTypeFilter : true;
+            const matchesType = userTypeFilter ? contact.userType?.toLowerCase() === userTypeFilter.toLowerCase() : true;
             return matchesSearch && matchesType;
         });
         setFilteredContacts(filtered);
     }, [searchQuery, userTypeFilter, contacts]);
+
+    // Check authentication before rendering
+    if (!AuthService.isAuthenticated()) {
+        return (
+            <div className="messages-container">
+                <Header />
+                <div className="messages-body">
+                    <div className="error-message">
+                        Please log in to view your messages.
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="messages-container">
@@ -168,7 +225,10 @@ const Messages = () => {
                                 className={`contact-item ${selectedContact && selectedContact._id === contact._id ? 'active' : ''}`}
                                 onClick={() => handleContactClick(contact)}
                             >
-                                <div className="contact-avatar" style={{ backgroundColor: getAvatarColor(contact.name) }}>
+                                <div 
+                                    className="contact-avatar" 
+                                    style={{ backgroundColor: getAvatarColor(contact.userType) }}
+                                >
                                     {contact.name.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="contact-details">
@@ -185,10 +245,7 @@ const Messages = () => {
                     {selectedContact ? (
                         <>
                             <div className="chat-header">
-                                <div className="chat-avatar" style={{ backgroundColor: getAvatarColor(selectedContact.name) }}>
-                                    {selectedContact.name.charAt(0).toUpperCase()}
-                                </div>
-                                <h2>{selectedContact.name}</h2>
+                                <span className="selected-contact-name">{selectedContact.name}</span>
                                 <div className="chat-actions">
                                     <button className="call-btn">📞</button>
                                     <button className="video-call-btn">📹</button>
@@ -208,7 +265,9 @@ const Messages = () => {
                                             <div className="chat-text">
                                                 {msg.text}
                                             </div>
-                                            <div className="chat-time">{new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                            <div className="chat-time">
+                                                {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
                                         </div>
                                     ))
                                 )}
