@@ -3,7 +3,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AuthService from "../../../services/authService";
-import Logo from "../assets/logo.jpg";
+import Logo from "../assets/logo.png";
 import "../styles/Login.css";
 
 const Login = () => {
