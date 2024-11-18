@@ -138,7 +138,7 @@ const Landing = () => {
             <img src={Logo} alt="" />
           </div>
           <div className="login-center">
-            <h2>Welcome back!</h2>
+            <h2>Welcome!</h2>
             <p>Please enter your details</p>
             {error && <div className="error-message">{error}</div>}
             <form onSubmit={handleLoginSubmit}>
