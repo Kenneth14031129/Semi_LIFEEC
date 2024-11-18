@@ -4,20 +4,19 @@ import AuthService from "../../../services/authService";
 import "../styles/Messages.css";
 import { api } from "../api/api";
 
-// Updated utility function with debug logging
 const getAvatarColor = (userType) => {
-    console.log("Getting avatar color for userType:", userType); // Debug log
+    console.log("Getting avatar color for userType:", userType);
     
-    switch (userType?.toLowerCase()) { // Add case insensitive comparison
+    switch (userType?.toLowerCase()) {
         case "nurse":
-            return "#000000"; // Black color for Nurse
+            return "#000000";
         case "family member":
-            return "#32CD32"; // Green for Family Member
+            return "#32CD32";
         case "nutritionist":
-            return "#FF69B4"; // Pink for Nutritionist
+            return "#FF69B4";
         default:
-            console.log("No matching user type found, using default color"); // Debug log
-            return "#808080"; // Default gray color
+            console.log("No matching user type found, using default color");
+            return "#808080";
     }
 };
 
@@ -32,10 +31,10 @@ const Messages = () => {
     const [userTypeFilter, setUserTypeFilter] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const [isCallActive, setIsCallActive] = useState(false);
+    const fileInputRef = useRef(null);
     const chatMessagesRef = useRef(null);
 
-    // Retrieve logged-in user ID from AuthService
     useEffect(() => {
         const user = AuthService.getUser();
         if (user && user._id) {
@@ -47,7 +46,6 @@ const Messages = () => {
         }
     }, []);
 
-    // Fetch contacts from the API
     useEffect(() => {
         const fetchContacts = async () => {
             try {
@@ -60,7 +58,7 @@ const Messages = () => {
                 console.log("Fetched contacts with user types:", data.users.map(user => ({
                     name: user.name,
                     userType: user.userType
-                }))); // Debug log
+                })));
                 
                 setContacts(data.users || []);
                 setFilteredContacts(data.users || []);
@@ -83,21 +81,88 @@ const Messages = () => {
         }
     }, [loggedInUserId]);
 
-    // Scroll to bottom when messages change
     useEffect(() => {
         if (chatMessagesRef.current) {
             chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
         }
     }, [messages]);
 
-    // Handle contact click
+    const handleCallClick = () => {
+        if (!selectedContact) {
+            setError("Please select a contact to call.");
+            return;
+        }
+
+        setIsCallActive(!isCallActive);
+        if (!isCallActive) {
+            console.log(`Initiating call with ${selectedContact.name}`);
+            alert(`Initiating call with ${selectedContact.name}`);
+        } else {
+            console.log(`Ending call with ${selectedContact.name}`);
+            alert(`Ending call with ${selectedContact.name}`);
+        }
+    };
+
+    const handleFileClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (!selectedContact) {
+            setError("Please select a contact to send files to.");
+            return;
+        }
+
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+        if (file.size > MAX_FILE_SIZE) {
+            setError("File size exceeds 5MB limit.");
+            return;
+        }
+
+        try {
+            // Create a preview URL for the file
+            const fileUrl = URL.createObjectURL(file);
+            
+            // Create message with file
+            const newMsg = {
+                senderId: loggedInUserId,
+                receiverId: selectedContact._id,
+                text: file.name,
+                fileUrl: fileUrl,
+                fileType: file.type,
+                isFile: true,
+                time: new Date().toISOString()
+            };
+
+            // Add message to the chat
+            setMessages(prev => [...prev, newMsg]);
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('senderId', loggedInUserId);
+            formData.append('receiverId', selectedContact._id);
+
+            console.log(`Uploading file: ${file.name}`);
+
+            // You would typically make an API call here to upload the file
+            // await api.post('/messages/upload', formData);
+
+            event.target.value = '';
+        } catch (error) {
+            console.error("Error handling file:", error);
+            setError("Failed to handle file.");
+        }
+    };
+
     const handleContactClick = (contact) => {
         setSelectedContact(contact);
         console.log("Selected contact:", contact);
         fetchMessages(contact._id);
     };
 
-    // Fetch messages for selected contact
     const fetchMessages = async (contactId) => {
         if (!loggedInUserId || !contactId) {
             console.error("Both sender and receiver IDs are required.");
@@ -131,7 +196,6 @@ const Messages = () => {
         }
     };
 
-    // Send message to server
     const sendMessageToServer = async (message) => {
         if (!AuthService.isAuthenticated()) {
             setError("Please log in to send messages.");
@@ -154,13 +218,13 @@ const Messages = () => {
         }
     };
 
-    // Handle sending new message
     const handleSendMessage = () => {
         if (newMessage.trim() && selectedContact) {
             const newMsg = {
                 senderId: loggedInUserId,
                 receiverId: selectedContact._id,
                 text: newMessage,
+                time: new Date().toISOString()
             };
             console.log("Preparing to send message:", newMsg);
 
@@ -172,7 +236,22 @@ const Messages = () => {
         }
     };
 
-    // Filter contacts based on search and user type
+    const renderMessage = (msg) => {
+        if (msg.isFile && msg.fileType?.startsWith('image/')) {
+            return (
+                <div className="message-image-container">
+                    <img 
+                        src={msg.fileUrl} 
+                        alt={msg.text} 
+                        className="message-image"
+                    />
+                    <span className="file-name">{msg.text}</span>
+                </div>
+            );
+        }
+        return <div className="chat-text">{msg.text}</div>;
+    };
+
     useEffect(() => {
         const filtered = contacts.filter(contact => {
             const matchesSearch = contact.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -182,7 +261,6 @@ const Messages = () => {
         setFilteredContacts(filtered);
     }, [searchQuery, userTypeFilter, contacts]);
 
-    // Check authentication before rendering
     if (!AuthService.isAuthenticated()) {
         return (
             <div className="messages-container">
@@ -247,8 +325,12 @@ const Messages = () => {
                             <div className="chat-header">
                                 <span className="selected-contact-name">{selectedContact.name}</span>
                                 <div className="chat-actions">
-                                    <button className="call-btn">📞</button>
-                                    <button className="video-call-btn">📹</button>
+                                    <button 
+                                        className={`call-btn ${isCallActive ? 'active' : ''}`}
+                                        onClick={handleCallClick}
+                                    >
+                                        {isCallActive ? '📞 End' : '📞 Call'}
+                                    </button>
                                     <button className="delete-btn">🗑️</button>
                                 </div>
                             </div>
@@ -261,19 +343,30 @@ const Messages = () => {
                                     <p>No messages available.</p>
                                 ) : (
                                     messages.map((msg) => (
-                                        <div key={msg.id} className={`chat-bubble ${msg.senderId === loggedInUserId ? 'right' : 'left'}`}>
-                                            <div className="chat-text">
-                                                {msg.text}
-                                            </div>
+                                        <div key={msg.id || Math.random()} className={`chat-bubble ${msg.senderId === loggedInUserId ? 'right' : 'left'}`}>
+                                            {renderMessage(msg)}
                                             <div className="chat-time">
-                                                {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {msg.time ? new Date(msg.time).toLocaleTimeString([], { 
+                                                    hour: '2-digit', 
+                                                    minute: '2-digit' 
+                                                }) : new Date().toLocaleTimeString([], { 
+                                                    hour: '2-digit', 
+                                                    minute: '2-digit' 
+                                                })}
                                             </div>
                                         </div>
                                     ))
                                 )}
                             </div>
                             <div className="message-input">
-                                <button className="file-btn">📎</button>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    style={{ display: 'none' }}
+                                    accept="image/*,.pdf,.doc,.docx"
+                                />
+                                <button className="file-btn" onClick={handleFileClick}>📎</button>
                                 <input
                                     type="text"
                                     placeholder="Type a message..."
