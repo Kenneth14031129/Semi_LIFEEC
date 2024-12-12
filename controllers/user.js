@@ -108,10 +108,26 @@ const register = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const user = await User.findByIdAndDelete(id);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+    return res.status(200).json({ msg: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return res.status(500).json({ msg: "Server error. Please try again later." });
+  }
+};
+
 module.exports = {
   login,
   register,
   dashboard,
   getAllUsers,
-  addNewUser
+  addNewUser,
+  deleteUser
 };

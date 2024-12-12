@@ -77,7 +77,7 @@ function AddUser() {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", width: 90 },
+    { field: "_id", headerName: "ID", width: 90 },
     { field: "name", headerName: "Name", width: 150 },
     { field: "email", headerName: "Email", width: 200 },
     { field: "userType", headerName: "User Type", width: 150 },
@@ -89,7 +89,7 @@ function AddUser() {
         <Button
           variant="contained"
           color="error"
-          onClick={() => handleDelete(params.row.id)}
+          onClick={() => handleDelete(params.row._id)}
         >
           Delete
         </Button>
@@ -208,7 +208,7 @@ function AddUser() {
             <Typography variant="body1">No users found.</Typography>
           ) : (
             <DataGrid
-              rows={users.map((user, index) => ({ id: index + 1, ...user }))}
+              rows={users.map(user => ({ ...user, id: user._id }))}
               columns={columns}
               pageSize={5}
               rowsPerPageOptions={[5]}
