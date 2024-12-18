@@ -172,6 +172,7 @@ const Activities = () => {
                 onChange={handleActivityChange}
                 required
                 variant="outlined"
+                multiline
               />
             </Box>
 

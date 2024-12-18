@@ -138,6 +138,7 @@ function AddUser() {
                 required
                 variant="outlined"
                 className="glass-input"
+                multiline
               />
             </Box>
             <Box sx={{ width: { xs: '100%', sm: '48%' } }}>
@@ -151,6 +152,7 @@ function AddUser() {
                 variant="outlined"
                 type="email"
                 className="glass-input"
+                multiline
               />
             </Box>
             <Box sx={{ width: { xs: '100%', sm: '48%' } }}>
@@ -164,6 +166,7 @@ function AddUser() {
                 variant="outlined"
                 type="password"
                 className="glass-input"
+                multiline
               />
             </Box>
             <Box sx={{ width: { xs: '100%', sm: '48%' } }}>

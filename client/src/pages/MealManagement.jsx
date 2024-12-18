@@ -195,6 +195,7 @@ const MealManagement = () => {
                   required
                   variant="outlined"
                   type="text"
+                  multiline
                 />
               </Box>
 
@@ -208,6 +209,7 @@ const MealManagement = () => {
                   required
                   variant="outlined"
                   type="text"
+                  multiline
                 />
               </Box>
             </Box>

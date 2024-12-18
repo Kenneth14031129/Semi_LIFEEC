@@ -298,6 +298,7 @@ const HealthManagement = () => {
                   name="currentMedication"
                   required
                   variant="outlined"
+                  multiline
                 />
               </Box>
 
@@ -311,6 +312,7 @@ const HealthManagement = () => {
                   name="dosage"
                   required
                   variant="outlined"
+                  multiline
                 />
               </Box>
 
@@ -342,6 +344,7 @@ const HealthManagement = () => {
                   name="medication"
                   required
                   variant="outlined"
+                  multiline
                 />
               </Box>
 

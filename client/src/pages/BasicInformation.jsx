@@ -81,6 +81,7 @@ function BasicInformation() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 variant="outlined"
+                multiline
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
@@ -159,6 +160,7 @@ function BasicInformation() {
                 onChange={(e) => setContact(e.target.value)}
                 required
                 variant="outlined"
+                multiline
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
@@ -189,6 +191,7 @@ function BasicInformation() {
                 onChange={(e) => handleEmergencyContactChange(e, "name")}
                 required
                 variant="outlined"
+                multiline
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
@@ -212,6 +215,7 @@ function BasicInformation() {
                 onChange={(e) => handleEmergencyContactChange(e, "phone")}
                 required
                 variant="outlined"
+                multiline
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
@@ -235,6 +239,7 @@ function BasicInformation() {
                 onChange={(e) => handleEmergencyContactChange(e, "email")}
                 variant="outlined"
                 type="email"
+                multiline
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
