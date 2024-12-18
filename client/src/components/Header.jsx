@@ -27,14 +27,14 @@ const Header = () => {
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
   
-  // Get user from localStorage
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const isWithin24Hours = (timestamp) => {
+    const now = new Date();
+    const notificationTime = new Date(timestamp);
+    const diffInHours = (now - notificationTime) / (1000 * 60 * 60);
+    return diffInHours <= 24;
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -43,8 +43,9 @@ const Header = () => {
       const data = await response.json();
       
       if (data.success) {
-        // Sort alerts by timestamp in descending order (newest first)
-        const sortedAlerts = data.data.sort((a, b) => 
+        const activeAlerts = data.data.filter(alert => isWithin24Hours(alert.timestamp));
+        
+        const sortedAlerts = activeAlerts.sort((a, b) => 
           new Date(b.timestamp) - new Date(a.timestamp)
         );
         
@@ -53,6 +54,25 @@ const Header = () => {
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 300000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const notificationTime = new Date(timestamp);
+    const diffInHours = Math.floor((now - notificationTime) / (1000 * 60 * 60));
+    const diffInMinutes = Math.floor((now - notificationTime) / (1000 * 60));
+
+    if (diffInHours >= 1) {
+      return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
+    } else {
+      return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
     }
   };
 
@@ -129,7 +149,7 @@ const Header = () => {
                   <div key={alert._id || index} className="notification-item">
                     <p>{alert.message}</p>
                     <span className="notification-time">
-                      {new Date(alert.timestamp).toLocaleString()}
+                      {formatTimeAgo(alert.timestamp)}
                     </span>
                   </div>
                 ))
