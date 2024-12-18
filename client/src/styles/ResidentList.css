@@ -13,7 +13,7 @@
 .resident-list {
   margin: 70px auto;
   padding: 20px;
-  max-width: 1100px; /* Adjusted max-width for better fit */
+  max-width: 1100px;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
@@ -22,7 +22,7 @@
 /* Title styling for Resident List */
 .resident-list h1 {
   text-align: center;
-  font-size: 1.8rem; /* Reduced font size */
+  font-size: 1.8rem;
   font-weight: bold;
   background: linear-gradient(45deg, #001f3f, #004080);
   background-clip: text;
@@ -34,102 +34,126 @@
   margin-bottom: 15px;
 }
 
-#residentSearch {
+/* Dropdown container styles */
+.resident-dropdown-container {
+  position: relative;
   width: 100%;
-  padding: 8px; /* Reduced padding */
+}
+
+/* Input field styles */
+.resident-dropdown-input {
+  width: 100%;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #f4f4f4;
-  font-size: 14px; /* Reduced font size */
+  font-size: 14px;
+  transition: border-color 0.3s ease;
 }
 
-/* Container for displaying resident options */
-.resident-options {
-  margin-top: 15px;
+.resident-dropdown-input:focus {
+  outline: none;
+  border-color: #004080;
+  box-shadow: 0 0 5px rgba(0, 64, 128, 0.2);
 }
 
-.resident-option {
-  padding: 10px; /* Reduced padding */
-  margin: 8px 0; /* Reduced margin */
-  border-radius: 8px;
-  background-color: #f4f4f4;
+/* Dropdown list container */
+.resident-dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+/* Dropdown list items */
+.resident-dropdown-item {
+  padding: 10px;
   cursor: pointer;
   transition: background-color 0.3s;
-  text-align: center;
-  font-weight: bold;
+  font-size: 14px;
   color: #333;
-  font-size: 14px; /* Reduced font size */
 }
 
-.resident-option:hover {
+.resident-dropdown-item:hover {
   background-color: #e0e0e0;
 }
 
-/* Resident details section layout using grid */
+/* Resident details section layout */
 .resident-details {
   margin-top: 20px;
-  padding: 20px; /* Reduced padding */
+  padding: 20px;
   background-color: #fafafa;
   border-radius: 10px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Adjusted to 4 equal columns */
-  gap: 15px; /* Reduced gap between sections */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
   position: relative;
 }
 
-/* Container for meal management and activities side by side */
+/* Container for meal management and activities */
 .meal-activities-container {
-  grid-column: span 2; /* Ensure both take equal space across two columns */
+  grid-column: span 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px; /* Reduced space between sections */
+  gap: 10px;
 }
 
 /* Each section within resident-details */
 .resident-section {
   background-color: #fff;
-  padding: 15px; /* Reduced padding */
+  padding: 15px;
   border-radius: 8px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
 .resident-details h2 {
-  font-size: 1.1rem; /* Reduced font size */
+  font-size: 1.1rem;
   color: #004080;
   font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .resident-details h3 {
-  font-size: 1.2rem; /* Reduced font size */
+  font-size: 1.2rem;
   color: #004080;
   border-bottom: 2px solid #004080;
-  padding-bottom: 3px; /* Reduced padding */
+  padding-bottom: 3px;
+  margin-bottom: 15px;
 }
 
 .resident-details p {
-  font-size: 0.95rem; /* Reduced font size */
+  font-size: 0.95rem;
   color: #333;
-  margin: 8px 0; /* Reduced margin */
+  margin: 8px 0;
+  line-height: 1.4;
 }
 
-/* Button container positioned at the bottom right */
+/* Button container */
 .button-container {
   position: absolute;
   bottom: 10px;
   right: 10px;
   display: flex;
-  gap: 8px; /* Reduced space between buttons */
+  gap: 8px;
 }
 
 /* Emergency alert button */
 .emergency-alert-button {
-  padding: 8px 15px; /* Reduced padding */
+  padding: 8px 15px;
   background-color: #ff4d4d;
   border: none;
   color: white;
   border-radius: 5px;
-  font-size: 0.95rem; /* Reduced font size */
+  font-size: 0.95rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -139,45 +163,134 @@
 }
 
 /* Edit and print buttons */
-.edit-button, .print-button {
-  padding: 8px 15px; /* Reduced padding */
+.edit-button, 
+.print-button {
+  padding: 8px 15px;
   background-color: #004080;
   border: none;
   color: white;
   border-radius: 5px;
-  font-size: 0.95rem; /* Reduced font size */
+  font-size: 0.95rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.edit-button:hover, .print-button:hover {
+.edit-button:hover, 
+.print-button:hover {
   background-color: #002a4d;
+}
+
+/* Save and cancel buttons */
+.save-button,
+.cancel-button {
+  padding: 8px 15px;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button {
+  background-color: #28a745;
+}
+
+.save-button:hover {
+  background-color: #218838;
+}
+
+.cancel-button {
+  background-color: #dc3545;
+}
+
+.cancel-button:hover {
+  background-color: #c82333;
+}
+
+/* Form input styles */
+.resident-section input[type="text"],
+.resident-section input[type="date"],
+.resident-section input[type="time"],
+.resident-section input[type="number"],
+.resident-section select,
+.resident-section textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.resident-section textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.resident-section label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #004080;
+  display: block;
+  margin-top: 10px;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
   .resident-list {
     padding: 15px;
+    margin: 20px auto;
   }
 
   .resident-list h1 {
     font-size: 1.6rem;
   }
 
-  .resident-option {
-    font-size: 0.9rem;
-  }
-
   .resident-details {
-    grid-template-columns: 1fr; /* Stack sections vertically on small screens */
+    grid-template-columns: 1fr;
   }
 
   .meal-activities-container {
-    grid-template-columns: 1fr; /* Stack sections vertically */
+    grid-template-columns: 1fr;
   }
 
   .button-container {
-    bottom: 5px;
-    right: 5px;
+    position: static;
+    margin-top: 20px;
+    justify-content: center;
   }
+
+  .resident-section {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .button-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .button-container button {
+    width: 100%;
+  }
+}
+
+/* Scrollbar styling */
+.resident-dropdown-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.resident-dropdown-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.resident-dropdown-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.resident-dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

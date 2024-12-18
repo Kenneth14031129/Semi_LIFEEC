@@ -12,6 +12,7 @@ const ResidentList = () => {
   const [selectedResident, setSelectedResident] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedResident, setEditedResident] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     fetchResidents();
@@ -128,7 +129,19 @@ const fetchMeals = async () => {
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
+    setIsDropdownOpen(true);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.resident-dropdown-container')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSelectResident = (resident) => {
     const residentActivities = activities.filter(activity => activity.residentId === resident._id);
@@ -148,6 +161,8 @@ const fetchMeals = async () => {
       meals: residentMeals
     });
     setIsEditing(false);
+    setSearchTerm(resident.name);
+    setIsDropdownOpen(false);
   };
 
   const handleEditClick = () => {
@@ -294,27 +309,33 @@ const fetchMeals = async () => {
       <div className="resident-list-component">
         <section className="resident-list">
           <h1>Resident List</h1>
-        <div className="form-group">
-          <label htmlFor="residentSearch">Search Resident:</label>
-          <input
-            type="text"
-            id="residentSearch"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            placeholder="Enter resident name"
-          />
-        </div>
-        <div className="resident-options">
-          {filteredResidents.map((resident, index) => (
-            <div
-              key={index}
-              className="resident-option"
-              onClick={() => handleSelectResident(resident)}
-            >
-              {resident.name}
+          <div className="form-group">
+            <label htmlFor="residentSearch">Select Resident:</label>
+            <div className="resident-dropdown-container">
+              <input
+                type="text"
+                id="residentSearch"
+                className="resident-dropdown-input"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onClick={() => setIsDropdownOpen(true)}
+                placeholder="Search or Select Resident"
+              />
+              {isDropdownOpen && filteredResidents.length > 0 && (
+                <div className="resident-dropdown-list">
+                  {filteredResidents.map((resident, index) => (
+                    <div
+                      key={index}
+                      className="resident-dropdown-item"
+                      onClick={() => handleSelectResident(resident)}
+                    >
+                      {resident.name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          ))}
-        </div>
+          </div>
 
         {selectedResident && (
           <div className="resident-details">
