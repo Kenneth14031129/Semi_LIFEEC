@@ -18,7 +18,7 @@ class AuthError extends Error {
 // Define role-based constants
 const USER_ROLES = {
   OWNER: 'Owner',
-  ADMIN: 'Admin'  // Changed from SUPER_ADMIN to ADMIN
+  ADMIN: 'Admin'
 };
 
 const Landing = () => {

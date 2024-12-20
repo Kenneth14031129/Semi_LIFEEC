@@ -13,12 +13,11 @@ const PatientBarChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Use your API service instead of axios
         const response = await api.get('/emergency-alerts');
 
         if (response.success) {
           // Group alerts by month
-          const monthCounts = Array(12).fill(0); // Initialize array for all 12 months
+          const monthCounts = Array(12).fill(0);
           
           response.data.forEach(alert => {
             const date = new Date(alert.timestamp);
@@ -26,36 +25,29 @@ const PatientBarChart = () => {
             monthCounts[monthIndex]++;
           });
 
-          const result = monthCounts.map((count, index) => ({
-            _id: index + 1,
-            count: count
-          }));
-
           const monthNames = [
             "January", "February", "March", "April", "May", "June", 
             "July", "August", "September", "October", "November", "December"
           ];
 
-          const transformedResult = result.map((item) => {
-            const monthIndex = item._id !== null ? parseInt(item._id) - 1 : null;
-            const monthName = monthIndex !== null && monthIndex >= 0 && monthIndex < 12 
-              ? monthNames[monthIndex] 
-              : "January";
+          const transformedResult = monthCounts.map((count, index) => ({
+            _id: monthNames[index],
+            count: count
+          }));
 
-            return {
-              ...item,
-              _id: monthName,
-            };
-          });
-
-          if (transformedResult && transformedResult.length > 0) {
+          if (transformedResult.length > 0) {
             const months = transformedResult.map((item) => item._id);
             const counts = transformedResult.map((item) => item.count);
+
+            // Calculate appropriate y-axis max and intervals
+            const maxValue = Math.max(...counts);
+            const yAxisMax = Math.ceil(maxValue / 5) * 5; // Round up to nearest multiple of 5
+            const interval = Math.max(1, Math.ceil(yAxisMax / 10)); // Ensure at least 10 intervals
 
             setChartData({
               series: [
                 {
-                  name: "Number of Emergency Alert",
+                  name: "Emergency Alerts",
                   data: counts,
                 },
               ],
@@ -66,24 +58,38 @@ const PatientBarChart = () => {
                   animations: {
                     enabled: true,
                     easing: "easeinout",
-                    speed: 1500,
+                    speed: 1000,
                   },
                   background: "#2E3B4E",
+                  toolbar: {
+                    show: true,
+                    tools: {
+                      download: true,
+                      selection: false,
+                      zoom: false,
+                      zoomin: false,
+                      zoomout: false,
+                      pan: false,
+                    },
+                  },
                 },
                 plotOptions: {
                   bar: {
                     horizontal: false,
                     borderRadius: 4,
-                    columnWidth: "50%",
+                    columnWidth: "60%",
+                    dataLabels: {
+                      position: 'top',
+                    },
                   },
                 },
                 fill: {
                   type: "gradient",
                   gradient: {
                     shade: "dark",
-                    gradientToColors: ["#004DFF", "#FF0000"],
+                    gradientToColors: ["#004DFF"],
                     inverseColors: false,
-                    opacityFrom: 1,
+                    opacityFrom: 0.9,
                     opacityTo: 0.7,
                     stops: [0, 100],
                   },
@@ -95,17 +101,26 @@ const PatientBarChart = () => {
                 },
                 dataLabels: {
                   enabled: true,
+                  offsetY: -20,
                   style: {
                     colors: ["#ffffff"],
+                    fontSize: '12px',
+                    fontWeight: 600,
                   },
                   formatter: function (val) {
-                    return Math.round(val);
+                    return val.toFixed(0);
                   },
                 },
                 grid: {
                   show: true,
-                  borderColor: "#444",
+                  borderColor: "#404040",
                   strokeDashArray: 5,
+                  position: 'back',
+                  yaxis: {
+                    lines: {
+                      show: true,
+                    },
+                  },
                 },
                 xaxis: {
                   categories: months,
@@ -114,6 +129,7 @@ const PatientBarChart = () => {
                     style: {
                       color: "#ffffff",
                       fontSize: "14px",
+                      fontWeight: 600,
                     },
                   },
                   labels: {
@@ -121,14 +137,25 @@ const PatientBarChart = () => {
                       colors: "#ffffff",
                       fontSize: "12px",
                     },
+                    rotateAlways: false,
+                    rotate: -45,
+                  },
+                  axisBorder: {
+                    show: true,
+                    color: '#404040',
+                  },
+                  axisTicks: {
+                    show: true,
+                    color: '#404040',
                   },
                 },
                 yaxis: {
                   title: {
-                    text: "Number of Emergency Alert",
+                    text: "Number of Emergency Alerts",
                     style: {
                       color: "#ffffff",
                       fontSize: "14px",
+                      fontWeight: 600,
                     },
                   },
                   labels: {
@@ -137,12 +164,21 @@ const PatientBarChart = () => {
                       fontSize: "12px",
                     },
                     formatter: function (value) {
-                      return Math.round(value);
+                      return Math.floor(value);
                     },
                   },
                   min: 0,
-                  max: Math.max(...counts) + 2,
-                  tickAmount: 5,
+                  max: yAxisMax,
+                  tickAmount: yAxisMax / interval,
+                  forceNiceScale: true,
+                  axisBorder: {
+                    show: true,
+                    color: '#404040',
+                  },
+                  axisTicks: {
+                    show: true,
+                    color: '#404040',
+                  },
                 },
                 title: {
                   text: "Resident Health Stats",
@@ -153,7 +189,6 @@ const PatientBarChart = () => {
                     fontWeight: "bold",
                   },
                 },
-                colors: ["#007BFF"],
                 legend: {
                   show: true,
                   position: "top",
@@ -161,7 +196,6 @@ const PatientBarChart = () => {
                   floating: true,
                   labels: {
                     colors: "#ffffff",
-                    useSeriesColors: true,
                   },
                 },
                 tooltip: {
@@ -169,7 +203,6 @@ const PatientBarChart = () => {
                   theme: "dark",
                   x: {
                     show: true,
-                    format: "MMM",
                   },
                   y: {
                     formatter: function (val) {
@@ -181,7 +214,6 @@ const PatientBarChart = () => {
             });
           }
         } else {
-          console.error("No valid data received from the API");
           setError("No data available.");
         }
       } catch (error) {

@@ -79,7 +79,7 @@ const dashboard = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    let users = await User.find({ userType: { $in: ["Nurse", "Nutritionist", "Relative"] } });
+    let users = await User.find({ userType: { $in: ["Nurse", "Nutritionist", "Family Member"] } });
     return res.status(200).json({ users });
   } catch (error) {
     console.error("Error fetching users:", error);
