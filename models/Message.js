@@ -4,12 +4,12 @@ const Schema = mongoose.Schema;
 const MessageSchema = new Schema({
     senderId: {
         type: Schema.Types.ObjectId,
-        ref: "User", // Assuming you have a User model
+        ref: "User",
         required: true,
     },
     receiverId: {
         type: Schema.Types.ObjectId,
-        ref: "User", // Assuming you have a User model
+        ref: "User",
         required: true,
     },
     text: {
@@ -18,12 +18,12 @@ const MessageSchema = new Schema({
     },
     time: {
         type: Date,
-        default: Date.now, // Automatically set to current date and time
+        default: Date.now,
     },
-    isRead: {
+    read: {  // Changed from isRead to read
         type: Boolean,
-        default: false, // Optional: flag to track if the message has been read
-    },
-}, { timestamps: true }); // Adds createdAt and updatedAt fields automatically
+        default: false,
+    }
+}, { timestamps: true });
 
 module.exports = mongoose.model("Message", MessageSchema);

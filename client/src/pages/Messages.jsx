@@ -31,7 +31,7 @@ const Messages = () => {
     const [userTypeFilter, setUserTypeFilter] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [isCallActive, setIsCallActive] = useState(false);
+    const [unreadCounts, setUnreadCounts] = useState({});
     const fileInputRef = useRef(null);
     const chatMessagesRef = useRef(null);
 
@@ -45,6 +45,33 @@ const Messages = () => {
             setError("You must be logged in to view messages.");
         }
     }, []);
+
+    useEffect(() => {
+        if (loggedInUserId) {
+            fetchUnreadCounts();
+            const interval = setInterval(fetchUnreadCounts, 30000); // Refresh every 30 seconds
+            return () => clearInterval(interval);
+        }
+    }, [loggedInUserId]);
+
+    const fetchUnreadCounts = async () => {
+        if (!loggedInUserId) return;
+    
+        try {
+            console.log("Fetching unread counts for user:", loggedInUserId); // Debug log
+            const response = await api.get(`/messages/unread/${loggedInUserId}`);
+            
+            if (response && response.unreadCounts) {
+                console.log("Received unread counts:", response.unreadCounts); // Debug log
+                setUnreadCounts(response.unreadCounts);
+            }
+        } catch (error) {
+            console.error("Error fetching unread counts:", {
+                message: error.message,
+                userId: loggedInUserId
+            });
+        }
+    };
 
     useEffect(() => {
         const fetchContacts = async () => {
@@ -87,19 +114,30 @@ const Messages = () => {
         }
     }, [messages]);
 
-    const handleCallClick = () => {
-        if (!selectedContact) {
-            setError("Please select a contact to call.");
-            return;
-        }
-
-        setIsCallActive(!isCallActive);
-        if (!isCallActive) {
-            console.log(`Initiating call with ${selectedContact.name}`);
-            alert(`Initiating call with ${selectedContact.name}`);
-        } else {
-            console.log(`Ending call with ${selectedContact.name}`);
-            alert(`Ending call with ${selectedContact.name}`);
+    const markMessagesAsRead = async (contactId) => {
+        if (!loggedInUserId || !contactId) return;
+    
+        try {
+            const response = await api.post('/messages/mark-read', {
+                userId: loggedInUserId,
+                contactId: contactId
+            });
+    
+            if (response) {
+                setUnreadCounts(prev => ({
+                    ...prev,
+                    [contactId]: 0
+                }));
+    
+                setMessages(prevMessages => 
+                    prevMessages.map(msg => ({
+                        ...msg,
+                        read: msg.senderId === contactId ? true : msg.read
+                    }))
+                );
+            }
+        } catch (error) {
+            console.error("Error marking messages as read:", error);
         }
     };
 
@@ -123,10 +161,8 @@ const Messages = () => {
         }
 
         try {
-            // Create a preview URL for the file
             const fileUrl = URL.createObjectURL(file);
             
-            // Create message with file
             const newMsg = {
                 senderId: loggedInUserId,
                 receiverId: selectedContact._id,
@@ -134,10 +170,10 @@ const Messages = () => {
                 fileUrl: fileUrl,
                 fileType: file.type,
                 isFile: true,
-                time: new Date().toISOString()
+                time: new Date().toISOString(),
+                read: false
             };
 
-            // Add message to the chat
             setMessages(prev => [...prev, newMsg]);
 
             const formData = new FormData();
@@ -147,9 +183,6 @@ const Messages = () => {
 
             console.log(`Uploading file: ${file.name}`);
 
-            // You would typically make an API call here to upload the file
-            // await api.post('/messages/upload', formData);
-
             event.target.value = '';
         } catch (error) {
             console.error("Error handling file:", error);
@@ -157,10 +190,11 @@ const Messages = () => {
         }
     };
 
-    const handleContactClick = (contact) => {
+    const handleContactClick = async (contact) => {
         setSelectedContact(contact);
         console.log("Selected contact:", contact);
-        fetchMessages(contact._id);
+        await fetchMessages(contact._id);
+        await markMessagesAsRead(contact._id);
     };
 
     const fetchMessages = async (contactId) => {
@@ -224,7 +258,8 @@ const Messages = () => {
                 senderId: loggedInUserId,
                 receiverId: selectedContact._id,
                 text: newMessage,
-                time: new Date().toISOString()
+                time: new Date().toISOString(),
+                read: false
             };
             console.log("Preparing to send message:", newMsg);
 
@@ -260,6 +295,13 @@ const Messages = () => {
         });
         setFilteredContacts(filtered);
     }, [searchQuery, userTypeFilter, contacts]);
+
+    const getLastMessage = (contact) => {
+        const contactMessages = messages.filter(msg => 
+            msg.senderId === contact._id || msg.receiverId === contact._id
+        );
+        return contactMessages[contactMessages.length - 1]?.text || "No messages yet";
+    };
 
     if (!AuthService.isAuthenticated()) {
         return (
@@ -300,7 +342,9 @@ const Messages = () => {
                         {filteredContacts.map(contact => (
                             <li
                                 key={contact._id}
-                                className={`contact-item ${selectedContact && selectedContact._id === contact._id ? 'active' : ''}`}
+                                className={`contact-item 
+                                    ${selectedContact && selectedContact._id === contact._id ? 'active' : ''} 
+                                    ${unreadCounts[contact._id] > 0 ? 'has-unread' : ''}`}
                                 onClick={() => handleContactClick(contact)}
                             >
                                 <div 
@@ -310,14 +354,18 @@ const Messages = () => {
                                     {contact.name.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="contact-details">
-                                    <div className="contact-name">{contact.name}</div>
-                                    <div className="contact-message">Last message preview...</div>
+                                    <div className="contact-name">
+                                        {contact.name}
+                                        {unreadCounts[contact._id] > 0 && (
+                                            <span className="unread-count">{unreadCounts[contact._id]}</span>
+                                        )}
+                                    </div>
+                                    <div className="contact-message">{getLastMessage(contact)}</div>
                                 </div>
                                 <div className="contact-time">Time</div>
                             </li>
                         ))}
                     </ul>
-                    <button className="add-contact-btn">+</button>
                 </aside>
                 <main className="message-content">
                     {selectedContact ? (
@@ -325,12 +373,6 @@ const Messages = () => {
                             <div className="chat-header">
                                 <span className="selected-contact-name">{selectedContact.name}</span>
                                 <div className="chat-actions">
-                                    <button 
-                                        className={`call-btn ${isCallActive ? 'active' : ''}`}
-                                        onClick={handleCallClick}
-                                    >
-                                        {isCallActive ? '📞 End' : '📞 Call'}
-                                    </button>
                                     <button className="delete-btn">🗑️</button>
                                 </div>
                             </div>
@@ -343,18 +385,27 @@ const Messages = () => {
                                     <p>No messages available.</p>
                                 ) : (
                                     messages.map((msg) => (
-                                        <div key={msg.id || Math.random()} className={`chat-bubble ${msg.senderId === loggedInUserId ? 'right' : 'left'}`}>
-                                            {renderMessage(msg)}
-                                            <div className="chat-time">
-                                                {msg.time ? new Date(msg.time).toLocaleTimeString([], { 
-                                                    hour: '2-digit', 
-                                                    minute: '2-digit' 
-                                                }) : new Date().toLocaleTimeString([], { 
-                                                    hour: '2-digit', 
-                                                    minute: '2-digit' 
-                                                })}
-                                            </div>
+                                    <div 
+                                        key={msg.id || Math.random()} 
+                                        className={`chat-bubble ${msg.senderId === loggedInUserId ? 'right' : 'left'} ${msg.read ? 'read' : 'unread'}`}
+                                    >
+                                        {renderMessage(msg)}
+                                        <div className="chat-time">
+                                            {msg.time ? new Date(msg.time).toLocaleTimeString([], { 
+                                                hour: '2-digit', 
+                                                minute: '2-digit' 
+                                            }) : new Date().toLocaleTimeString([], { 
+                                                hour: '2-digit', 
+                                                minute: '2-digit' 
+                                            })}
+                                            {/* Add read status indicator for sent messages */}
+                                            {msg.senderId === loggedInUserId && (
+                                                <span className="read-status">
+                                                    {msg.read ? '✓✓' : '✓'}
+                                                </span>
+                                            )}
                                         </div>
+                                    </div>
                                     ))
                                 )}
                             </div>

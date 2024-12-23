@@ -1,10 +1,13 @@
 const express = require("express");
-const { sendMessage, getMessages, markMessagesAsRead } = require("../controllers/message");
+const { sendMessage, getMessages, markMessagesAsRead, getUnreadCounts } = require("../controllers/message");
 
 const router = express.Router();
 
-router.post("/send", sendMessage); // POST /api/v1/messages/send
-router.get("/:senderId/:receiverId", getMessages); // GET /api/v1/messages/:senderId/:receiverId
-router.put("/mark-as-read", markMessagesAsRead); // PUT /api/v1/messages/mark-as-read
+// Put the /unread route BEFORE the dynamic route
+router.get("/unread/:userId", getUnreadCounts);
+router.post("/send", sendMessage);
+router.post("/mark-read", markMessagesAsRead);
+// Put this dynamic route LAST
+router.get("/:senderId/:receiverId", getMessages);
 
 module.exports = router;

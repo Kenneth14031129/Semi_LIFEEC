@@ -1,4 +1,5 @@
-const Message = require("../models/Message");
+const mongoose = require('mongoose');
+const Message = require('../models/Message');
 
 // Send a new message
 const sendMessage = async (req, res) => {
@@ -58,26 +59,69 @@ const getMessages = async (req, res) => {
 
 // Mark all messages from a sender as read for a specific receiver
 const markMessagesAsRead = async (req, res) => {
-    const { senderId, receiverId } = req.body;
+    const { userId, contactId } = req.body;
 
-    if (!senderId || !receiverId) {
-        return res.status(400).json({ msg: "Sender ID and Receiver ID are required." });
+    if (!userId || !contactId) {
+        return res.status(400).json({ msg: "User ID and Contact ID are required." });
     }
 
     try {
         const result = await Message.updateMany(
-            { senderId, receiverId, isRead: false },
-            { $set: { isRead: true } }
+            { 
+                senderId: contactId,
+                receiverId: userId,
+                read: false 
+            },
+            { $set: { read: true } }
         );
 
         return res.status(200).json({
-            msg: "Messages marked as read.",
-            updatedCount: result.nModified, // Provides feedback on how many messages were marked as read
+            msg: "Messages marked as read",
+            updatedCount: result.modifiedCount
         });
     } catch (error) {
         console.error("Error marking messages as read:", error);
-        return res.status(500).json({
-            msg: "Server error. Please try again later.",
+        return res.status(500).json({ msg: "Server error" });
+    }
+};
+
+const getUnreadCounts = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        console.log('Processing unread counts for userId:', userId);
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ msg: "Invalid user ID format" });
+        }
+
+        const unreadCounts = await Message.aggregate([
+            {
+                $match: {
+                    receiverId: new mongoose.Types.ObjectId(userId),
+                    read: false
+                }
+            },
+            {
+                $group: {
+                    _id: "$senderId",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const unreadCountsObj = unreadCounts.reduce((acc, curr) => {
+            acc[curr._id.toString()] = curr.count;
+            return acc;
+        }, {});
+
+        console.log('Unread counts computed:', unreadCountsObj);
+        return res.status(200).json({ unreadCounts: unreadCountsObj });
+
+    } catch (error) {
+        console.error('Error in getUnreadCounts:', error);
+        return res.status(500).json({ 
+            msg: "Server error while fetching unread counts",
+            error: error.message 
         });
     }
 };
@@ -86,4 +130,5 @@ module.exports = {
     sendMessage,
     getMessages,
     markMessagesAsRead,
+    getUnreadCounts
 };
