@@ -20,6 +20,12 @@ const getAvatarColor = (userType) => {
     }
 };
 
+const formatUserType = (userType) => {
+    if (!userType) return '';
+    
+    return userType.toLowerCase() === 'family member' ? 'Relative' : userType;
+};
+
 const Messages = () => {
     const [loggedInUserId, setLoggedInUserId] = useState(null);
     const [contacts, setContacts] = useState([]);
@@ -34,6 +40,7 @@ const Messages = () => {
     const [unreadCounts, setUnreadCounts] = useState({});
     const fileInputRef = useRef(null);
     const chatMessagesRef = useRef(null);
+    const [lastMessages, setLastMessages] = useState({});
 
     useEffect(() => {
         const user = AuthService.getUser();
@@ -296,11 +303,46 @@ const Messages = () => {
         setFilteredContacts(filtered);
     }, [searchQuery, userTypeFilter, contacts]);
 
+    useEffect(() => {
+        const fetchLastMessages = async () => {
+            if (!loggedInUserId || !contacts.length) return;
+
+            const messages = {};
+            for (const contact of contacts) {
+                try {
+                    const data = await api.get(`/messages/${loggedInUserId}/${contact._id}`);
+                    const contactMessages = data.messages || [];
+                    if (contactMessages.length > 0) {
+                        messages[contact._id] = contactMessages[contactMessages.length - 1];
+                    }
+                } catch (error) {
+                    console.error(`Error fetching messages for contact ${contact._id}:`, error);
+                }
+            }
+            setLastMessages(messages);
+        };
+
+        fetchLastMessages();
+    }, [contacts, loggedInUserId]);
+
     const getLastMessage = (contact) => {
-        const contactMessages = messages.filter(msg => 
-            msg.senderId === contact._id || msg.receiverId === contact._id
-        );
-        return contactMessages[contactMessages.length - 1]?.text || "No messages yet";
+        const lastMessage = lastMessages[contact._id];
+        if (!lastMessage) return "No messages yet";
+
+        // If it's the logged-in user's message, add "You: " prefix
+        const prefix = lastMessage.senderId === loggedInUserId ? "You: " : "";
+        
+        // For file messages
+        if (lastMessage.isFile) {
+            return `${prefix}📎 ${lastMessage.text}`;
+        }
+        
+        // For text messages, truncate if too long
+        const truncatedText = lastMessage.text.length > 30 
+            ? lastMessage.text.substring(0, 27) + "..."
+            : lastMessage.text;
+        
+        return `${prefix}${truncatedText}`;
     };
 
     if (!AuthService.isAuthenticated()) {
@@ -335,7 +377,7 @@ const Messages = () => {
                     >
                         <option value="">All User Types</option>
                         <option value="Nurse">Nurse</option>
-                        <option value="Family Member">Family Member</option>
+                        <option value="Family Member">Relative</option>
                         <option value="Nutritionist">Nutritionist</option>
                     </select>
                     <ul className="contact-list">
@@ -360,18 +402,36 @@ const Messages = () => {
                                             <span className="unread-count">{unreadCounts[contact._id]}</span>
                                         )}
                                     </div>
-                                    <div className="contact-message">{getLastMessage(contact)}</div>
+                                    <div className="contact-message">
+                                        {getLastMessage(contact)}
+                                        {lastMessages[contact._id] && (
+                                            <span className="message-time">
+                                                {new Date(lastMessages[contact._id].time).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="contact-time">Time</div>
                             </li>
                         ))}
                     </ul>
-                </aside>
+                    </aside>
                 <main className="message-content">
                     {selectedContact ? (
                         <>
                             <div className="chat-header">
-                                <span className="selected-contact-name">{selectedContact.name}</span>
+                                <div className="contact-info">
+                                    <span className="selected-contact-name">
+                                        {selectedContact.name}
+                                    </span>
+                                    {selectedContact.userType && (
+                                        <span className="user-type">
+                                            ({formatUserType(selectedContact.userType)})
+                                        </span>
+                                    )}
+                                </div>
                                 <div className="chat-actions">
                                     <button className="delete-btn">🗑️</button>
                                 </div>
