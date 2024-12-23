@@ -390,20 +390,21 @@ const Messages = () => {
                                         className={`chat-bubble ${msg.senderId === loggedInUserId ? 'right' : 'left'} ${msg.read ? 'read' : 'unread'}`}
                                     >
                                         {renderMessage(msg)}
-                                        <div className="chat-time">
-                                            {msg.time ? new Date(msg.time).toLocaleTimeString([], { 
-                                                hour: '2-digit', 
-                                                minute: '2-digit' 
-                                            }) : new Date().toLocaleTimeString([], { 
-                                                hour: '2-digit', 
-                                                minute: '2-digit' 
-                                            })}
-                                            {/* Add read status indicator for sent messages */}
+                                        <div className="message-metadata">
                                             {msg.senderId === loggedInUserId && (
                                                 <span className="read-status">
                                                     {msg.read ? '✓✓' : '✓'}
                                                 </span>
                                             )}
+                                            <span className="chat-time">
+                                                {msg.time ? new Date(msg.time).toLocaleTimeString([], { 
+                                                    hour: '2-digit', 
+                                                    minute: '2-digit' 
+                                                }) : new Date().toLocaleTimeString([], { 
+                                                    hour: '2-digit', 
+                                                    minute: '2-digit' 
+                                                })}
+                                            </span>
                                         </div>
                                     </div>
                                     ))

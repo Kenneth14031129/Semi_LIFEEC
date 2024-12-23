@@ -99,7 +99,7 @@
     background: rgba(255, 255, 255, 0.2);
 }
 
-.contact-item.unread {
+.contact-item.has-unread {
     background: rgba(0, 123, 255, 0.1);
 }
 
@@ -129,7 +129,7 @@
     justify-content: space-between;
 }
 
-.contact-item.unread .contact-name {
+.contact-item.has-unread .contact-name {
     font-weight: 700;
 }
 
@@ -150,9 +150,13 @@
 .contact-message {
     font-size: 14px;
     color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
 }
 
-.contact-item.unread .contact-message {
+.contact-item.has-unread .contact-message {
     color: rgba(255, 255, 255, 0.9);
     font-weight: 500;
 }
@@ -218,24 +222,6 @@
     gap: 10px;
 }
 
-.message-image-container {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.message-image {
-    max-width: 200px;
-    max-height: 200px;
-    border-radius: 8px;
-    object-fit: contain;
-}
-
-.file-name {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
-}
-
 .chat-bubble {
     max-width: 70%;
     padding: 12px 16px;
@@ -246,6 +232,7 @@
     display: flex;
     flex-direction: column;
     background: rgba(255, 255, 255, 0.1);
+    min-width: 120px;
 }
 
 .chat-bubble.left {
@@ -267,35 +254,53 @@
 .chat-text {
     font-size: 16px;
     line-height: 1.4;
-    margin-bottom: 15px; /* Space for timestamp */
+    margin-bottom: 20px;
+    word-wrap: break-word;
 }
 
-.chat-time {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.7);
-    align-self: flex-end;
-    margin-top: auto;
+.message-metadata {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
     position: absolute;
     bottom: 5px;
     right: 12px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
 }
 
-/* Read/unread indicators */
-.chat-bubble.right .read-status {
-    position: absolute;
-    bottom: 5px;
-    right: 55px; /* Position before the time */
+.read-status {
+    display: inline-flex;
+    align-items: center;
     font-size: 12px;
 }
 
 .chat-bubble.right.read .read-status {
     color: #32CD32;
-    content: "✓✓";
 }
 
 .chat-bubble.right.unread .read-status {
     color: rgba(255, 255, 255, 0.6);
-    content: "✓";
+}
+
+.message-image-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.message-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.file-name {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .message-input {
@@ -416,6 +421,7 @@
 
     .chat-bubble {
         max-width: 85%;
+        min-width: 100px;
     }
 
     .message-image {
@@ -423,9 +429,17 @@
         max-height: 150px;
     }
 
+    .message-metadata {
+        font-size: 10px;
+    }
+
     .unread-count {
         min-width: 18px;
         height: 18px;
         font-size: 11px;
+    }
+
+    .contact-message {
+        max-width: 200px;
     }
 }
