@@ -222,7 +222,6 @@ const Messages = () => {
         
         try {
             const data = await api.get(`/messages/${loggedInUserId}/${contactId}`);
-            console.log("Response data:", data);
             console.log("Fetched messages:", data.messages);
             setMessages(data.messages || []);
         } catch (error) {
