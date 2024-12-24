@@ -6,23 +6,15 @@ const BASE_URL = window.location.origin.includes('localhost')
 
 export const api = {
   get: async (endpoint) => {
-    const token = AuthService.getAuthToken();
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(`${BASE_URL}${endpoint}`);
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
   },
   
   post: async (endpoint, data) => {
-    const token = AuthService.getAuthToken();
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
