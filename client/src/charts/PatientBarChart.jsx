@@ -64,15 +64,7 @@ const PatientBarChart = () => {
                 },
                 background: "transparent",
                 toolbar: {
-                  show: true,
-                  tools: {
-                    download: true,
-                    selection: true,
-                    zoom: true,
-                    zoomin: true,
-                    zoomout: true,
-                    pan: true,
-                  },
+                  show: false
                 },
               },
               plotOptions: {
@@ -168,14 +160,6 @@ const PatientBarChart = () => {
                 },
               },
               yaxis: {
-                title: {
-                  text: "Number of Alerts",
-                  style: {
-                    color: "#ffffff",
-                    fontSize: "14px",
-                    fontWeight: 600,
-                  },
-                },
                 labels: {
                   style: {
                     colors: "#ffffff",

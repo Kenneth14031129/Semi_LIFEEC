@@ -1,4 +1,3 @@
-// Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -143,7 +142,14 @@ const Dashboard = () => {
             <div className="chart-container">
               <div className="chart-header">
                 <div className="chart-title">
-                  <h2>Alert Trends</h2>
+                  <h2 style={{
+                    background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    fontSize: '2rem',
+                    fontWeight: '700'
+                  }}>Alert Trends</h2>
                   <p className="chart-subtitle">Monthly emergency alerts overview</p>
                 </div>
               </div>
