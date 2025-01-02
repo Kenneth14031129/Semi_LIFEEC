@@ -13,7 +13,6 @@ import {
   FormControl,
   InputLabel,
   Snackbar,
-  CircularProgress,
 } from "@mui/material";
 
 const Activities = () => {
@@ -24,7 +23,6 @@ const Activities = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [residents, setResidents] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -33,9 +31,7 @@ const Activities = () => {
 
   const fetchResidents = async () => {
     try {
-      setLoading(true);
       setError(null);
-
       const data = await api.get('/patient/list');
       
       if (!Array.isArray(data)) {
@@ -49,8 +45,6 @@ const Activities = () => {
       setError(error.message);
       setSnackbarMessage("Error loading residents. Please try again.");
       setSnackbarOpen(true);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -101,16 +95,6 @@ const Activities = () => {
     }
     setSnackbarOpen(false);
   };
-
-  if (loading) {
-    return (
-      <div className="activities-container">
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <CircularProgress />
-        </Box>
-      </div>
-    );
-  }
 
   if (error) {
     return (
