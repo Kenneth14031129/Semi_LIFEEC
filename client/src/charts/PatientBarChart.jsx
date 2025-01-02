@@ -1,3 +1,4 @@
+// PatientBarChart.jsx
 import React, { useEffect, useState } from "react";
 import ApexCharts from "react-apexcharts";
 import { api } from "../api/api";
@@ -41,8 +42,8 @@ const PatientBarChart = () => {
 
             // Calculate appropriate y-axis max and intervals
             const maxValue = Math.max(...counts);
-            const yAxisMax = Math.ceil(maxValue / 5) * 5; // Round up to nearest multiple of 5
-            const interval = Math.max(1, Math.ceil(yAxisMax / 10)); // Ensure at least 10 intervals
+            const yAxisMax = Math.ceil(maxValue / 5) * 5;
+            const interval = Math.max(1, Math.ceil(yAxisMax / 10));
 
             setChartData({
               series: [

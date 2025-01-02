@@ -42,7 +42,8 @@
 .dashboard-component main {
   width: 100%;
   max-width: 1200px;
-  height: 700px;
+  height: auto;
+  min-height: 700px;
   padding: var(--large-padding);
   background: var(--glass-background);
   border-radius: var(--border-radius);
@@ -53,6 +54,35 @@
   color: var(--text-color);
   position: relative;
   overflow: hidden;
+}
+
+/* Stats container styles */
+.dashboard-component .stats-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.dashboard-component .stat-card {
+  flex: 1;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+}
+
+.dashboard-component .stat-card h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.dashboard-component .stat-card p {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
 }
 
 /* Add glass effect shine */
@@ -108,44 +138,95 @@
   outline-offset: 2px;
 }
 
-/* Utility classes for spacing */
-.dashboard-component .m-0 { margin: 0; }
-.dashboard-component .m-sm { margin: var(--small-padding); }
-.dashboard-component .m-md { margin: var(--medium-padding); }
-.dashboard-component .m-lg { margin: var(--large-padding); }
-
-.dashboard-component .p-0 { padding: 0; }
-.dashboard-component .p-sm { padding: var(--small-padding); }
-.dashboard-component .p-md { padding: var(--medium-padding); }
-.dashboard-component .p-lg { padding: var(--large-padding); }
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .dashboard-component .chart-container {
-    max-width: 100%;
-  }
-
-  .dashboard-component main h1 {
-    font-size: 1.5rem;
+  /* Utility classes for spacing */
+  .dashboard-component .m-0 { margin: 0; }
+  .dashboard-component .m-sm { margin: var(--small-padding); }
+  .dashboard-component .m-md { margin: var(--medium-padding); }
+  .dashboard-component .m-lg { margin: var(--large-padding); }
+  
+  .dashboard-component .p-0 { padding: 0; }
+  .dashboard-component .p-sm { padding: var(--small-padding); }
+  .dashboard-component .p-md { padding: var(--medium-padding); }
+  .dashboard-component .p-lg { padding: var(--large-padding); }
+  
+  /* Loading state styles */
+  .dashboard-component .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 1.2rem;
+    color: var(--text-color);
   }
   
-  .dashboard-component .main-body {
-    background-attachment: scroll; /* Better performance on mobile */
-  }
-}
-
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .dashboard-component {
-    --background-color: #121212;
-    --text-color: #e0e0e0;
-    --primary-color: #bb86fc;
-    --secondary-color: #3700b3;
-    --box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
-    --glass-background: rgba(18, 18, 18, 0.25);
-  }
-
+  /* Chart container styles */
   .dashboard-component .chart-container {
     background: rgba(44, 44, 44, 0.2);
+    border-radius: var(--border-radius);
+    padding: var(--medium-padding);
+    margin-top: var(--medium-padding);
   }
-}
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .dashboard-component .chart-container {
+      max-width: 100%;
+      padding: var(--small-padding);
+    }
+  
+    .dashboard-component main {
+      padding: var(--medium-padding);
+    }
+  
+    .dashboard-component main h1 {
+      font-size: 1.5rem;
+    }
+    
+    .dashboard-component .main-body {
+      background-attachment: scroll; /* Better performance on mobile */
+      padding: 10px;
+    }
+  
+    .dashboard-component .stats-container {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .dashboard-component .stat-card {
+      padding: 15px;
+    }
+  
+    .dashboard-component .stat-card p {
+      font-size: 1.5rem;
+    }
+  }
+  
+  /* Dark Mode Support */
+  @media (prefers-color-scheme: dark) {
+    .dashboard-component {
+      --background-color: #121212;
+      --text-color: #e0e0e0;
+      --primary-color: #bb86fc;
+      --secondary-color: #3700b3;
+      --box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
+      --glass-background: rgba(18, 18, 18, 0.25);
+    }
+  
+    .dashboard-component .chart-container {
+      background: rgba(44, 44, 44, 0.2);
+    }
+  
+    .dashboard-component .stat-card {
+      background: rgba(44, 44, 44, 0.3);
+    }
+  }
+  
+  /* Error state styles */
+  .dashboard-component .error {
+    color: #ff6b6b;
+    text-align: center;
+    padding: var(--medium-padding);
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: var(--border-radius);
+    margin: var(--medium-padding) 0;
+  }
