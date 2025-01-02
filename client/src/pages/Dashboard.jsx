@@ -5,7 +5,7 @@ import "../styles/Dashboard.css";
 import Header from "../components/Header";
 import PatientBarChart from "../charts/PatientBarChart";
 import { api } from "../api/api";
-import { AlertCircle, Users, Activity, Calendar, Bell, ArrowUp, ArrowDown, Clock } from 'lucide-react';
+import { AlertCircle, Users, Activity, Clock } from 'lucide-react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
