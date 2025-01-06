@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/Semi_LIFEEC/', // Updated to match your repository name
+  base: '/Semi_LIFEEC/',
 })
