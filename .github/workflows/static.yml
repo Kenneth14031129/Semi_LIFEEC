@@ -2,8 +2,9 @@ name: Deploy Vite React App
 
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -15,35 +16,45 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    # Install backend dependencies
+    - name: Install Backend Dependencies
+      run: npm install
+
+    # Install frontend dependencies and build
+    - name: Install Frontend Dependencies and Build
+      run: |
+        npm install
+        npm run build
+      env:
+        CI: false
+
+    # Configure GitHub Pages
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    # Upload the build output
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'  # Vite's default build output directory
+
+    # Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4
       
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          
-      - name: Install Root Dependencies
-        run: npm install
-        
-      - name: Build Client
-        run: npm run build
-        
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './client/dist'
-          
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
