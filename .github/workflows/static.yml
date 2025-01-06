@@ -29,10 +29,11 @@ jobs:
         node-version: '18'
         cache: 'npm'
 
-    # Install dependencies and build the client
+    # Install and build the client with required dependencies
     - name: Build Client
       run: |
         cd client
+        npm install @mui/material @emotion/react @emotion/styled
         npm install
         npm run build
       env:
@@ -42,13 +43,11 @@ jobs:
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
-    # Upload the build output from the correct path
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: './client/dist'  # Updated path to match client directory structure
+        path: './client/dist'
 
-    # Deploy to GitHub Pages
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
