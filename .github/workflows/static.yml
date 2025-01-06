@@ -29,13 +29,10 @@ jobs:
         node-version: '18'
         cache: 'npm'
 
-    # Install backend dependencies
-    - name: Install Backend Dependencies
-      run: npm install
-
-    # Install frontend dependencies and build
-    - name: Install Frontend Dependencies and Build
+    # Install dependencies and build the client
+    - name: Build Client
       run: |
+        cd client
         npm install
         npm run build
       env:
@@ -45,16 +42,17 @@ jobs:
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
-    # Upload the build output
+    # Upload the build output from the correct path
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: './dist'  # Vite's default build output directory
+        path: './client/dist'  # Updated path to match client directory structure
 
     # Deploy to GitHub Pages
     - name: Deploy to GitHub Pages
+      id: deployment
       uses: actions/deploy-pages@v4
-      
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
