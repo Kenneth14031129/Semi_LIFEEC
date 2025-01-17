@@ -107,7 +107,7 @@ const Header = () => {
           </li>
           <li>
             <NavLink to="/residentList" className="nav-item" activeClassName="active">
-              <FaList className="nav-icon" /> Resident List
+              <FaList className="nav-icon" /> Residents List
             </NavLink>
           </li>
           <li>
