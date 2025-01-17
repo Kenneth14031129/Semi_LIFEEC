@@ -38,7 +38,6 @@ const Messages = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [unreadCounts, setUnreadCounts] = useState({});
-    const fileInputRef = useRef(null);
     const chatMessagesRef = useRef(null);
     const [lastMessages, setLastMessages] = useState({});
 
@@ -145,55 +144,6 @@ const Messages = () => {
             }
         } catch (error) {
             console.error("Error marking messages as read:", error);
-        }
-    };
-
-    const handleFileClick = () => {
-        fileInputRef.current?.click();
-    };
-
-    const handleFileChange = async (event) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        if (!selectedContact) {
-            setError("Please select a contact to send files to.");
-            return;
-        }
-
-        const MAX_FILE_SIZE = 5 * 1024 * 1024;
-        if (file.size > MAX_FILE_SIZE) {
-            setError("File size exceeds 5MB limit.");
-            return;
-        }
-
-        try {
-            const fileUrl = URL.createObjectURL(file);
-            
-            const newMsg = {
-                senderId: loggedInUserId,
-                receiverId: selectedContact._id,
-                text: file.name,
-                fileUrl: fileUrl,
-                fileType: file.type,
-                isFile: true,
-                time: new Date().toISOString(),
-                read: false
-            };
-
-            setMessages(prev => [...prev, newMsg]);
-
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('senderId', loggedInUserId);
-            formData.append('receiverId', selectedContact._id);
-
-            console.log(`Uploading file: ${file.name}`);
-
-            event.target.value = '';
-        } catch (error) {
-            console.error("Error handling file:", error);
-            setError("Failed to handle file.");
         }
     };
 
@@ -471,14 +421,6 @@ const Messages = () => {
                                 )}
                             </div>
                             <div className="message-input">
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    onChange={handleFileChange}
-                                    style={{ display: 'none' }}
-                                    accept="image/*,.pdf,.doc,.docx"
-                                />
-                                <button className="file-btn" onClick={handleFileClick}>📎</button>
                                 <input
                                     type="text"
                                     placeholder="Type a message..."
