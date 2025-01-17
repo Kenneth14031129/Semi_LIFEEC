@@ -308,7 +308,7 @@ const fetchMeals = async () => {
       <Header />
       <div className="resident-list-component">
         <section className="resident-list">
-          <h1>Resident List</h1>
+          <h1>Residents List</h1>
           <div className="form-group">
             <label htmlFor="residentSearch">Select Resident:</label>
             <div className="resident-dropdown-container">
